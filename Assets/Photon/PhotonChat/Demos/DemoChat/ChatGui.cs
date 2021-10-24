@@ -365,6 +365,7 @@ namespace Photon.Chat.Demo
 
         public void OnConnected()
         {
+            Debug.Log($"Successfully connected");
             if (this.ChannelsToJoinOnConnect != null && this.ChannelsToJoinOnConnect.Length > 0)
             {
                 this.chatClient.Subscribe(this.ChannelsToJoinOnConnect, this.HistoryLengthToFetch);
@@ -626,6 +627,7 @@ namespace Photon.Chat.Demo
                 Debug.Log("ShowChannel failed to find channel: " + channelName);
                 return;
             }
+            Debug.LogFormat($"Found channel {channelName}");
 
             this.selectedChannelName = channelName;
             this.CurrentChannelText.text = channel.ToStringMessages();
