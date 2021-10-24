@@ -41,7 +41,6 @@ namespace Uno
         void Start()
         {
             DontDestroyOnLoad(this.gameObject);
-            UserName = PlayerNameInputField.getUserName();
 
 #if PHOTON_UNITY_NETWORKING
             this.chatAppSettings = PhotonNetwork.PhotonServerSettings.AppSettings.GetChatSettings();
@@ -87,6 +86,7 @@ namespace Uno
         public void Connect()
         {
             Debug.Log($"Initiated connection...");
+            UserName = PlayerNameInputField.getUserName();
             chatClient = new ChatClient(this);
             chatClient.AuthValues = new AuthenticationValues(UserName);
             chatClient.ConnectUsingSettings(chatAppSettings);
@@ -160,12 +160,12 @@ namespace Uno
 
         public void OnDisconnected()
         {
-            throw new System.NotImplementedException();
+            Debug.Log("Disconnected from Photon Network");
         }
 
         public void OnConnected()
         {
-            connectedAsText.text = $"Connected as {PhotonNetwork.NickName}";
+            connectedAsText.text = $"Connected as {UserName}";
             chatClient.SetOnlineStatus(ChatUserStatus.Online);
             chatClient.Subscribe(new string[] { currentChannel });
         }
@@ -187,12 +187,12 @@ namespace Uno
 
         public void OnSubscribed(string[] channels, bool[] results)
         {
-            throw new System.NotImplementedException();
+            Debug.Log(channels.ToString());
         }
 
         public void OnUnsubscribed(string[] channels)
         {
-            throw new System.NotImplementedException();
+            Debug.Log(channels.ToString());
         }
 
         public void OnStatusUpdate(string user, int status, bool gotMessage, object message)
