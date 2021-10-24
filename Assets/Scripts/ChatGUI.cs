@@ -16,6 +16,7 @@ namespace Uno
         #region Private Fields
 
         string currentChannel = "general";
+        bool selectChatField = false;
 
         #endregion
 
@@ -55,6 +56,14 @@ namespace Uno
             {
                 chatClient.Service();
             }
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                InputFieldChat.Select();
+            }
+            if(Input.GetKeyUp(KeyCode.Return) || Input.GetKeyUp(KeyCode.KeypadEnter))
+            {
+                Submit();
+            }
         }
 
         public void OnApplicationQuit()
@@ -91,6 +100,7 @@ namespace Uno
                 SendChatMessage(this.InputFieldChat.text);
                 InputFieldChat.text = "";
             }
+            InputFieldChat.Select();
         }
 
         public void OnClickSend()
@@ -99,6 +109,18 @@ namespace Uno
             {
                 SendChatMessage(this.InputFieldChat.text);
                 InputFieldChat.text = "";
+                InputFieldChat.Select();
+            }
+            
+        }
+
+        public void Submit()
+        {
+            if (InputFieldChat != null)
+            {
+                SendChatMessage(this.InputFieldChat.text);
+                InputFieldChat.text = "";
+                InputFieldChat.Select();
             }
         }
 
