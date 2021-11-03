@@ -182,17 +182,17 @@ namespace Uno
 
         public void OnPrivateMessage(string sender, object message, string channelName)
         {
-            throw new System.NotImplementedException();
+            return;
         }
 
         public void OnSubscribed(string[] channels, bool[] results)
         {
-            Debug.Log(channels.ToString());
+            return;
         }
 
         public void OnUnsubscribed(string[] channels)
         {
-            Debug.Log(channels.ToString());
+            return;
         }
 
         public void OnStatusUpdate(string user, int status, bool gotMessage, object message)
@@ -225,7 +225,6 @@ namespace Uno
             }
             this.currentChannel = channelName;
             this.CurrentChannelText.text = channel.ToStringMessages();
-            Debug.Log($"ShowChannel: {channelName}");
         }
 
         #endregion
