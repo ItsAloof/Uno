@@ -26,6 +26,12 @@ public class Card : MonoBehaviour
         this.transform.localPosition = new Vector3(v.x, v.y, oldZPosition);
     }
 
+    private void OnMouseUpAsButton()
+    {
+        this.transform.SetParent(GameObject.FindGameObjectWithTag("Deck").gameObject.transform);
+        this.transform.localPosition = new Vector3(0, 0, 0);
+    }
+
     // Update is called once per frame
     void Update()
     {
