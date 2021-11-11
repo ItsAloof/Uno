@@ -38,7 +38,7 @@ public class Game : MonoBehaviour
                 goto redo;
             cardGo.GetComponent<SpriteRenderer>().sprite = Sprites[cI];
             Vector3 v3 = cardGo.GetComponent<Transform>().position;
-            Vector3 newV3 = new Vector3(-200 + i*50, v3.y + 100, 0 - i*2);
+            Vector3 newV3 = new Vector3(-300 + i*100, v3.y + 150, 0 - i*1.25f);
             cardGo.GetComponent<Transform>().localPosition = newV3;
             Debug.Log($"{cardGo.GetComponent<Transform>().localPosition}");
             cards.Add(cardGo);
