@@ -24,7 +24,7 @@ namespace Photon.Pun
     /// the PhotonTransformViewClassic is added to the list of observed components
     /// </summary>
     [AddComponentMenu("Photon Networking/Photon Transform View Classic")]
-    public class PhotonTransformViewClassic : MonoBehaviourPun, IPunObservable
+    public class PhotonTransformViewClassic : MonoBehaviourPun, IOnEventCallback
     {
         //As this component is very complex, we separated it into multiple classes.
         //The PositionModel, RotationModel and ScaleMode store the data you are able to

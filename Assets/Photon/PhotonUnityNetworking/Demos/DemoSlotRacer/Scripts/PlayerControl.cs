@@ -23,7 +23,7 @@ namespace Photon.Pun.Demo.SlotRacer
     /// Handle the Car instance 
     /// </summary>
     [RequireComponent(typeof(SplineWalker))]
-    public class PlayerControl : MonoBehaviourPun, IPunObservable
+    public class PlayerControl : MonoBehaviourPun, IOnEventCallback
     {
         /// <summary>
         /// The car prefabs to pick depending on the grid position.
@@ -79,7 +79,7 @@ namespace Photon.Pun.Demo.SlotRacer
         /// </summary>
         /// <param name="stream">Stream.</param>
         /// <param name="info">Info.</param>
-        void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        void IOnEventCallback.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
             // currently there is no strategy to improve on bandwidth, just passing the current distance and speed is enough, 
             // Input could be passed and then used to better control speed value

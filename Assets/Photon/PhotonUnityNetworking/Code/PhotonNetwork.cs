@@ -2285,7 +2285,7 @@ namespace Photon.Pun
         /// </summary>
         /// <remarks>
         /// To receive events, implement IOnEventCallback in any class and register it via PhotonNetwork.AddCallbackTarget.
-        /// See <see cref="IOnEventCallback.OnEvent"/>.
+        /// See <see cref="Realtime.IOnEventCallback.OnEvent"/>.
         ///
         /// The eventContent is optional. If set, eventContent must be a "serializable type", something that
         /// the client can turn into a byte[] basically. Most basic types and arrays of them are supported, including

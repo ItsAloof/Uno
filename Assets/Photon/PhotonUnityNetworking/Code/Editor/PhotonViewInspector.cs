@@ -322,7 +322,7 @@ namespace Photon.Pun
                                 listProperty.GetArrayElementAtIndex(i).objectReferenceValue = _pav;
                                 Debug.Log("PhotonView has detected you dropped a Animator, so we switched to PhotonAnimatorView so that you can serialized the Animator variables");
                             }
-                            else if (!typeof(IPunObservable).IsAssignableFrom(_newType))
+                            else if (!typeof(IOnEventCallback).IsAssignableFrom(_newType))
                             {
                                 bool _ignore = false;
 #if PLAYMAKER

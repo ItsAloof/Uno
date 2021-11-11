@@ -506,7 +506,7 @@ namespace Photon.Pun
                 this.ObservedComponents.Clear();
             }
 
-            this.transform.GetNestedComponentsInChildren<Component, IPunObservable, PhotonView>(force || this.observableSearch == ObservableSearch.AutoFindAll, this.ObservedComponents);
+            this.transform.GetNestedComponentsInChildren<Component, IOnEventCallback, PhotonView>(force || this.observableSearch == ObservableSearch.AutoFindAll, this.ObservedComponents);
         }
 
 
@@ -538,7 +538,7 @@ namespace Photon.Pun
 
         protected internal void DeserializeComponent(Component component, PhotonStream stream, PhotonMessageInfo info)
         {
-            IPunObservable observable = component as IPunObservable;
+            IOnEventCallback observable = component as IOnEventCallback;
             if (observable != null)
             {
                 observable.OnPhotonSerializeView(stream, info);
@@ -551,7 +551,7 @@ namespace Photon.Pun
 
         protected internal void SerializeComponent(Component component, PhotonStream stream, PhotonMessageInfo info)
         {
-            IPunObservable observable = component as IPunObservable;
+            IOnEventCallback observable = component as IOnEventCallback;
             if (observable != null)
             {
                 observable.OnPhotonSerializeView(stream, info);
