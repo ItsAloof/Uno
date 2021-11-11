@@ -6,6 +6,18 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Menu.unity
+    guid: 3b7ab4193721a7948b3f51e64c2baaac
+  - enabled: 1
+    path: Assets/Scenes/ConnectToServer.unity
+    guid: 40260166ef5dd154eb06476745a94a14
+  - enabled: 1
+    path: Assets/Scenes/Lobby.unity
+    guid: 9c6ac8c2411e03c408abea35054ebada
+  - enabled: 1
+    path: Assets/Scenes/Game Room (2 Players).unity
+    guid: 57e2b92bb89e585428d4f0786c50c3ef
+  - enabled: 0
     path: Assets/Scenes/Launcher.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   m_configObjects: {}
