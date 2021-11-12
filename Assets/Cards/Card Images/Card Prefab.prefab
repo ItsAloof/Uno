@@ -12,8 +12,12 @@ GameObject:
   - component: {fileID: 6188271431410579745}
   - component: {fileID: -4363963706038185926}
   - component: {fileID: 9171844405337855015}
+<<<<<<< HEAD
   - component: {fileID: 4010030756734160346}
   - component: {fileID: -2697275104348572180}
+=======
+  - component: {fileID: -4935242620592302934}
+>>>>>>> main
   m_Layer: 5
   m_Name: Card Prefab
   m_TagString: Untagged
@@ -129,13 +133,19 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 183, y: 284}
   m_EdgeRadius: 0
+<<<<<<< HEAD
 --- !u!114 &4010030756734160346
 MonoBehaviour:
+=======
+--- !u!222 &-4935242620592302934
+CanvasRenderer:
+>>>>>>> main
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8483188770914265568}
+<<<<<<< HEAD
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
@@ -168,3 +178,6 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
+=======
+  m_CullTransparentMesh: 1
+>>>>>>> main
