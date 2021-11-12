@@ -14,6 +14,10 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     public GameObject RoomPanel;
     public Text roomName;
 
+    private void Awake()
+    {
+        PhotonNetwork.AutomaticallySyncScene = true;
+    }
 
     private void Start()
     {

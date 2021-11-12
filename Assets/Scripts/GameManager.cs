@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.UI;
 
 namespace Un
 {
     public class GameManager : MonoBehaviourPunCallbacks
     {
+        #region Serialized Fields
         [Tooltip("Card Prefab")]
         [SerializeField]
         GameObject cardPrefab;
+
+        public Text indicesText;
 
         [Tooltip("List of all card images")]
         [SerializeField]
@@ -27,57 +31,45 @@ namespace Un
         [Tooltip("The player decks in order of how they appear where 0")]
         [SerializeField]
         List<GameObject> playerDeck = new List<GameObject>();
+        #endregion
+
+        #region Private Fields
+        
         private List<int> deckIndices = new List<int>();
+        List<int> taken = new List<int>();
 
-        [SerializeField]
-        GameObject playButton;
+        #endregion
 
+        #region Public Fields
         public List<Player> Players = new List<Player>();
 
         public Player currentTurn;
         public int turn = 0;
         public int playerIndex;
+        #endregion
+
+        #region Public Static Fields
 
         public static GameManager gameManager;
 
-        bool isConnecting;
+        #endregion
 
-
-
-        static List<GameObject> deck = new List<GameObject>();
-        List<int> taken = new List<int>();
-
-        private void Awake()
-        {
-            PhotonNetwork.AutomaticallySyncScene = true;
-        }
+        #region MonoBehavior Methods
 
         // Start is called before the first frame update
         void Start()
         {
             gameManager = this;
             //Camera.main.depthTextureMode = DepthTextureMode.Depth;
-        }
-
-        public void Connect()
-        {
-            if (!PhotonNetwork.IsConnected)
+            if (PhotonNetwork.IsConnected)
             {
-                if (!PlayerPrefs.HasKey("PlayerName"))
-                {
-                    PlayerPrefs.SetString("PlayerName", $"Anon#{Random.Range(0, 999)}");
-                }
-
-                PhotonNetwork.NickName = PlayerPrefs.GetString("PlayerName");
-                isConnecting = PhotonNetwork.ConnectUsingSettings();
-                Debug.Log($"Connecting: {isConnecting}");
-            }
-            else
-            {
-                PhotonNetwork.JoinRandomRoom();
+                startGame();
             }
         }
 
+        #endregion
+
+        #region Private Functions CardGeneration
 
         private List<GameObject> generateCards(Player player, GameObject parent, int owner)
         {
@@ -142,92 +134,51 @@ namespace Un
             }
             return generatedCards;
         }
+        #endregion
 
+        #region Public Methods
 
-
-        // Update is called once per frame
-        void Update()
+        public void startGame()
         {
-        }
-
-        public override void OnConnectedToMaster()
-        {
-            Debug.Log($"Successfully connected to Photon as {PhotonNetwork.NickName}. Running Game Version: {PhotonNetwork.GameVersion}, UserId: {PhotonNetwork.LocalPlayer.UserId}");
-            if (isConnecting)
-            {
-                bool room = PhotonNetwork.JoinRandomRoom();
-                Debug.Log("Joining room: " + room);
-            }
-        }
-
-        public override void OnJoinRandomFailed(short returnCode, string message)
-        {
-            base.OnJoinRandomFailed(returnCode, message);
-            Debug.Log($"No rooms available creating room now...");
-            PhotonNetwork.CreateRoom(null, new RoomOptions() { MaxPlayers = 2 });
-        }
-
-
-
-        public override void OnJoinedRoom()
-        {
-            Debug.Log($"Joined room successfully!");
-            if (!PhotonNetwork.IsMasterClient)
-            {
-                Players.AddRange(PhotonNetwork.PlayerList);
-                playerIndex = Players.Count - 1;
-            }
-            debugPlayerList();
-
+            Players.AddRange(PhotonNetwork.PlayerList);
             if (PhotonNetwork.IsMasterClient)
             {
-                playerDeck = generateCards(PhotonNetwork.LocalPlayer, localPlayer, playerIndex);
-                Players.Add(PhotonNetwork.LocalPlayer);
-                playerIndex = 0;
-            }
-            else
-            {
-                this.photonView.ViewID = PhotonNetwork.PlayerList.Length;
-            }
-
-            currentTurn = PhotonNetwork.MasterClient;
-        }
-
-        private void debugPlayerList()
-        {
-            //for()
-            //for(int i = 0; i < players.Count; i++)
-            //{
-            //    Debug.Log($"Index: {i} Player: {players..NickName}");
-            //}
-        }
-
-        public override void OnPlayerEnteredRoom(Player newPlayer)
-        {
-            Debug.Log($"{newPlayer.NickName} has joined! UserId: {newPlayer.UserId}");
-            if (Players.Contains(newPlayer))
-                return;
-            Players.Add(newPlayer);
-            debugPlayerList();
-            if (PhotonNetwork.IsMasterClient)
-            {
-                List<object> objects = new List<object>();
-                int[] indices = generateCardIndices();
-                foreach (int i in indices)
+                int[] masterIndices = generateCardIndices();
+                sendGeneratedCards(ToObjArr(masterIndices), Players[0], RpcTarget.All, playerIndex);
+                for (int i = 0; i < Players.Count; i++)
                 {
-                    objects.Add(i);
+                    if (Players[i].IsMasterClient)
+                        continue;
+                    else
+                    {
+                        int[] indices = generateCardIndices();
+                        sendGeneratedCards(ToObjArr(indices), Players[i], RpcTarget.All, i);
+                    }
                 }
-                this.gameObject.GetPhotonView().RPC("receiveCards", RpcTarget.All, newPlayer, objects.ToArray());
-                generateCards(newPlayer, remotePlayers[0], indices, Players.Count-1);
-                objects.Clear();
-                foreach (int i in deckIndices)
-                {
-                    objects.Add(i);
-                }
-                this.photonView.RPC("receiveCards", RpcTarget.All, PhotonNetwork.LocalPlayer, objects.ToArray());
             }
+            playerIndex = Players.FindIndex(p => p == PhotonNetwork.LocalPlayer);
         }
 
+
+
+        public object[] ToObjArr(int[] indices)
+        {
+            List<object> objArr = new List<object>();
+            foreach(int i in indices)
+            {
+                objArr.Add(i);
+            }
+            return objArr.ToArray();
+        }
+
+        public void sendGeneratedCards(object[] indices, Player player, RpcTarget target, int PlayerIndex)
+        {
+            photonView.RPC("receiveCards", target, player, indices);
+        }
+
+        #endregion
+
+        #region PunRPC
         [PunRPC]
         void receiveCards(Player player, object[] indices)
         {
@@ -237,23 +188,24 @@ namespace Un
                 indexList.Add((int)obj);
             }
 
-            if (player == PhotonNetwork.LocalPlayer && !PhotonNetwork.IsMasterClient)
+            if (player == PhotonNetwork.LocalPlayer)
             {
-                playerDeck.AddRange(generateCards(player, localPlayer, indexList.ToArray(), playerIndex));
+                playerDeck.AddRange(generateCards(player, localPlayer, indexList.ToArray(), Players.FindIndex(p => p == player)));
             }
-            else if (player == PhotonNetwork.MasterClient)
+            else if (player != PhotonNetwork.LocalPlayer)
             {
-                generateCards(player, remotePlayers[0], indexList.ToArray(), Players.FindIndex(p => p == player));
+                generateCards(player, remotePlayers[remotePlayers.Length - 1], indexList.ToArray(), Players.FindIndex(p => p == player));
             }
         }
+        #endregion
 
-        public override void OnPlayerLeftRoom(Player otherPlayer)
-        {
-            if (Players.Contains(otherPlayer))
-            {
-                Players.Remove(otherPlayer);
-            }
-        }
+        //public override void OnPlayerLeftRoom(Player otherPlayer)
+        //{
+        //    if (Players.Contains(otherPlayer))
+        //    {
+        //        Players.Remove(otherPlayer);
+        //    }
+        //}
 
     }
 }
