@@ -12,12 +12,7 @@ GameObject:
   - component: {fileID: 6188271431410579745}
   - component: {fileID: -4363963706038185926}
   - component: {fileID: 9171844405337855015}
-<<<<<<< HEAD
-  - component: {fileID: 4010030756734160346}
-  - component: {fileID: -2697275104348572180}
-=======
   - component: {fileID: -4935242620592302934}
->>>>>>> main
   m_Layer: 5
   m_Name: Card Prefab
   m_TagString: Untagged
@@ -89,7 +84,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 183, y: 284}
+  m_Size: {x: 1.83, y: 2.84}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
@@ -127,57 +122,17 @@ BoxCollider2D:
     oldSize: {x: 1.83, y: 2.84}
     newSize: {x: 1.83, y: 2.84}
     adaptiveTilingThreshold: 0.5
-    drawMode: 1
+    drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
   m_Size: {x: 183, y: 284}
   m_EdgeRadius: 0
-<<<<<<< HEAD
---- !u!114 &4010030756734160346
-MonoBehaviour:
-=======
 --- !u!222 &-4935242620592302934
 CanvasRenderer:
->>>>>>> main
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8483188770914265568}
-<<<<<<< HEAD
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 0
-  ObservedComponents:
-  - {fileID: -2697275104348572180}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &-2697275104348572180
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8483188770914265568}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
-=======
   m_CullTransparentMesh: 1
->>>>>>> main
