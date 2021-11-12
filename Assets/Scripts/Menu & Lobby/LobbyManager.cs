@@ -18,6 +18,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     public PlayerItem playerItemPrefab;
     public Transform playerItemParent;
 
+    public GameObject playButton;
+
 
     private void Start()
     {
@@ -28,7 +30,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         if (roomCreateInputField.text.Length >= 1)    // checking that name is not empty
         {
-            PhotonNetwork.CreateRoom(roomCreateInputField.text, new RoomOptions());   //can add { MaxPlayers = *a number*} after RoomOptions()
+            PhotonNetwork.CreateRoom(roomCreateInputField.text, new RoomOptions(){ MaxPlayers = 2 });   //can add { MaxPlayers = *a number*} after RoomOptions()
         }
     }
 
@@ -89,6 +91,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             {
                 newPlayerItem.ApplyLocalChanges();
             }
+
             playerItemsList.Add(newPlayerItem);
         }
     }
@@ -102,9 +105,26 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         UpdatePlayerList();
     }
-    
-        
-            
+
+    public void Update()
+    {
+        if (PhotonNetwork.IsMasterClient && PhotonNetwork.CurrentRoom.PlayerCount >= 2)
+        {
+            playButton.SetActive(true);
+        }
+        else
+        {
+            playButton.SetActive(false);
+        }
+    }
+
+    public void OnClickPlayButton()
+    {
+        PhotonNetwork.LoadLevel("Game Room (2 Players)");
+    }
+
+
+
 
 
 
