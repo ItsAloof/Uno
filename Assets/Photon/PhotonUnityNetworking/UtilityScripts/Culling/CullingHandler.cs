@@ -23,7 +23,7 @@ namespace Photon.Pun.UtilityScripts
     ///     Handles the network culling.
     /// </summary>
     [RequireComponent(typeof(PhotonView))]
-    public class CullingHandler : MonoBehaviour, IPunObservable
+    public class CullingHandler : MonoBehaviour, IOnEventCallback
     {
         #region VARIABLES
 

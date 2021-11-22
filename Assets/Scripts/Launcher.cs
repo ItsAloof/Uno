@@ -64,8 +64,8 @@ namespace Uno
 
         public void Connect()
         {
-            progressLabel.SetActive(true);
-            mainMenu.SetActive(false);
+            //progressLabel.SetActive(true);
+            //mainMenu.SetActive(false);
             if (PhotonNetwork.IsConnected)
             {
                 PhotonNetwork.JoinRandomRoom();

@@ -25,7 +25,7 @@ namespace Photon.Pun
     /// Triggers are raised true during one frame only.
     /// </remarks>
     [AddComponentMenu("Photon Networking/Photon Animator View")]
-    public class PhotonAnimatorView : MonoBehaviourPun, IPunObservable
+    public class PhotonAnimatorView : MonoBehaviourPun, IOnEventCallback
     {
         #region Enums
 

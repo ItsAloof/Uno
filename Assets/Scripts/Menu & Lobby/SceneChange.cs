@@ -17,5 +17,10 @@ public class SceneChange : MonoBehaviour
         PhotonNetwork.Disconnect();
     }
 
+    public void OnPlayClick()
+    {
+        SceneManager.LoadScene("Game Room 2");
+    }
+
 
 }

@@ -16,7 +16,7 @@ namespace Photon.Pun
 
     [RequireComponent(typeof(Rigidbody2D))]
     [AddComponentMenu("Photon Networking/Photon Rigidbody 2D View")]
-    public class PhotonRigidbody2DView : MonoBehaviourPun, IPunObservable
+    public class PhotonRigidbody2DView : MonoBehaviourPun, IOnEventCallback
     {
         private float m_Distance;
         private float m_Angle;
