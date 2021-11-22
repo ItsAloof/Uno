@@ -15,9 +15,9 @@ namespace Uno
         [SerializeField]
         private byte maxPlayersPerRoom = 2;
 
-        //[Tooltip("The UI Panel to let the user enter name, connect and play")]
-        //[SerializeField]
-        //private GameObject mainMenu;
+        [Tooltip("The UI Panel to let the user enter name, connect and play")]
+        [SerializeField]
+        private GameObject mainMenu;
 
         //[Tooltip("The UI Label to inform the user that the connection is in progress")]
         //[SerializeField]
@@ -47,7 +47,7 @@ namespace Uno
         // Start is called before the first frame update
         void Start()
         {
-            //mainMenu.SetActive(true);
+            mainMenu.SetActive(true);
             //progressLabel.SetActive(false);
             chatGUI.SetActive(false);
         }
@@ -65,7 +65,7 @@ namespace Uno
         public void Connect()
         {
            // progressLabel.SetActive(true);
-           // mainMenu.SetActive(false);
+            mainMenu.SetActive(false);
             if (PhotonNetwork.IsConnected)
             {
                 PhotonNetwork.JoinRandomRoom();
@@ -101,7 +101,7 @@ namespace Uno
         {
             isConnecting = false;
            // progressLabel.SetActive(false);
-           // mainMenu.SetActive(true);
+            mainMenu.SetActive(true);
             Debug.Log($"Disconnected due to {cause}");
         }
 
@@ -109,7 +109,7 @@ namespace Uno
         {
             Debug.Log("Joined room successfully!");
            // progressLabel.SetActive(false);
-           // mainMenu.SetActive(false);
+            mainMenu.SetActive(false);
             chatGUI.SetActive(true);
         }
 

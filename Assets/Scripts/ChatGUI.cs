@@ -11,7 +11,7 @@ using AuthenticationValues = Photon.Chat.AuthenticationValues;
 
 namespace Uno
 {
-    public class ChatGUI : MonoBehaviour, IChatClientListener
+    public class ChatGUI : MonoBehaviourPunCallbacks, IChatClientListener
     {
         #region Private Fields
 
@@ -32,9 +32,9 @@ namespace Uno
 
         #region Private Serializable Fields
 
-        //[Tooltip("The text that displays what username the player is currently connected as")]
-        //[SerializeField]
-        // private Text connectedAsText;
+        [Tooltip("The text that displays what username the player is currently connected as")]
+        [SerializeField]
+         private Text connectedAsText;
 
         #endregion
         // Start is called before the first frame update
@@ -165,7 +165,7 @@ namespace Uno
 
         public void OnConnected()
         {
-            //connectedAsText.text = $"Connected as {UserName}";
+            connectedAsText.text = $"Connected as {PhotonNetwork.NickName}";
             chatClient.SetOnlineStatus(ChatUserStatus.Online);
             chatClient.Subscribe(new string[] { currentChannel });
         }
