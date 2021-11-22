@@ -32,9 +32,9 @@ namespace Uno
 
         #region Private Serializable Fields
 
-        [Tooltip("The text that displays what username the player is currently connected as")]
-        [SerializeField]
-        private Text connectedAsText;
+        //[Tooltip("The text that displays what username the player is currently connected as")]
+        //[SerializeField]
+        // private Text connectedAsText;
 
         #endregion
         // Start is called before the first frame update
@@ -86,7 +86,7 @@ namespace Uno
         public void Connect()
         {
             Debug.Log($"Initiated connection...");
-            UserName = PlayerNameInputField.getUserName();
+            UserName = PhotonNetwork.NickName;
             chatClient = new ChatClient(this);
             chatClient.AuthValues = new AuthenticationValues(UserName);
             chatClient.ConnectUsingSettings(chatAppSettings);
@@ -165,7 +165,7 @@ namespace Uno
 
         public void OnConnected()
         {
-            connectedAsText.text = $"Connected as {UserName}";
+            //connectedAsText.text = $"Connected as {UserName}";
             chatClient.SetOnlineStatus(ChatUserStatus.Online);
             chatClient.Subscribe(new string[] { currentChannel });
         }
