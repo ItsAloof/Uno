@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8146071211303398529}
   - component: {fileID: 6975905746033730306}
+  - component: {fileID: -264252717081394127}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -45,6 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardPrefab: {fileID: 8483188770914265568, guid: 64380254561862e41857e1ebaf38a582,
     type: 3}
+  indicesText: {fileID: 0}
   Sprites:
   - {fileID: 21300000, guid: e26bae841209ac247b0bc824ac3bafbe, type: 3}
   - {fileID: 21300000, guid: 4a2c1ed6a8355904785d0b78bdfd272a, type: 3}
@@ -104,4 +106,27 @@ MonoBehaviour:
   remotePlayers: []
   playerDeck:
   - {fileID: 0}
-  playButton: {fileID: 0}
+  turn: 0
+  playerIndex: 0
+--- !u!114 &-264252717081394127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6749669086744812902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0

@@ -173,6 +173,8 @@ namespace Un
 
         public void sendGeneratedCards(object[] indices, Player player, RpcTarget target, int PlayerIndex)
         {
+            foreach (int i in indices)
+                Debug.Log($"Index: {i}");
             photonView.RPC("receiveCards", target, player, indices);
         }
 
