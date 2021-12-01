@@ -17,6 +17,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     public List<PlayerItem> playerItemsList = new List<PlayerItem>();
     public PlayerItem playerItemPrefab;
     public Transform playerItemParent;
+    public byte maxPlayers = 4;
 
     public GameObject playButton;
 
@@ -30,7 +31,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         if (roomCreateInputField.text.Length >= 1)    // checking that name is not empty
         {
-            PhotonNetwork.CreateRoom(roomCreateInputField.text, new RoomOptions(){ MaxPlayers = 2 });   //can add { MaxPlayers = *a number*} after RoomOptions()
+            PhotonNetwork.CreateRoom(roomCreateInputField.text, new RoomOptions(){ MaxPlayers = maxPlayers });   //can add { MaxPlayers = *a number*} after RoomOptions()
         }
     }
 

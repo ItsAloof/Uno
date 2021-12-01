@@ -13,12 +13,16 @@ namespace Un
         int focusZPosition = -100;
         float oldZPosition;
         bool isDiscarded = false;
-        Player owner { get; set; }
-        int ownerId { get; set; }
+        UnPlayer owner { get; set; }
+
+        string color { get; set; }
+        int number { get; set; }
         Transform parent;
         GameManager gameManager;
-        private int position;
+        private int position { get; set; }
+        private int CardIndex { get; set; }
         int TurnData = 0, PositionData = 1, PlayerIdData = 2;
+
 
         // Start is called before the first frame update
         void Start()
@@ -30,6 +34,7 @@ namespace Un
         {
             PhotonNetwork.NetworkingClient.EventReceived += NetworkingClient_EventReceived;
         }
+
         public override void OnDisable()
         {
             PhotonNetwork.NetworkingClient.EventReceived -= NetworkingClient_EventReceived;
@@ -45,11 +50,12 @@ namespace Un
                 int positionDatum = (int)data[PositionData];
                 int turnDatum = (int)data[TurnData];
                 int playerIdDatum = (int)data[PlayerIdData];
-
-                Debug.Log($"PlayerId: {ownerId} PlayerIdDatum: {playerIdDatum} Position: {position} PositionData: {positionDatum} Turn: {gameManager.turn} TurnData: {turnDatum}");
-                if (ownerId == playerIdDatum && position == positionDatum)
+                if (owner == null)
+                    return;
+                if (owner.getOwnerId() == playerIdDatum && position == positionDatum)
                 {
                     discard(GameObject.FindGameObjectWithTag("Discard").transform);
+                    //owner.removeCard(position);
                     gameManager.turn = turnDatum;
                 }
             }
@@ -57,7 +63,7 @@ namespace Un
 
         private void OnMouseEnter()
         {
-            if (isDiscarded || PhotonNetwork.LocalPlayer != owner)
+            if (isDiscarded || PhotonNetwork.LocalPlayer != owner.getOwner())
                 return;
             Vector3 v = transform.localPosition;
             oldZPosition = v.z;
@@ -66,7 +72,7 @@ namespace Un
 
         private void OnMouseExit()
         {
-            if (isDiscarded || PhotonNetwork.LocalPlayer != owner)
+            if (isDiscarded || PhotonNetwork.LocalPlayer != owner.getOwner())
                 return;
             Vector3 v = transform.localPosition;
             this.transform.localPosition = new Vector3(v.x, v.y, oldZPosition);
@@ -74,16 +80,16 @@ namespace Un
 
         private void OnMouseUpAsButton()
         {
-            if (isDiscarded || PhotonNetwork.LocalPlayer != owner || gameManager.turn != ownerId)
+            if (isDiscarded || PhotonNetwork.LocalPlayer != owner.getOwner() || gameManager.turn != owner.getOwnerId())
                 return;
             GameObject go = GameObject.FindGameObjectWithTag("Discard");
-            discard(go.transform);
-            gameManager.turn++;
+            gameManager.turn += gameManager.direction;
             if (gameManager.turn == gameManager.Players.Count)
             {
                 gameManager.turn = 0;
             }
-            object[] data = new object[] { gameManager.turn, position, ownerId };
+            object[] data = new object[] { gameManager.turn, position, owner.getOwnerId() };
+            discard(go.transform);
             PhotonNetwork.RaiseEvent(EventCodes.MOVE_CARD_EVENT, data, RaiseEventOptions.Default, SendOptions.SendReliable);
         }
 
@@ -96,16 +102,42 @@ namespace Un
             cards++;
         }
 
-        public void setOwner(Player player, int id)
+        public void setOwner(UnPlayer owner)
         {
-            owner = player;
-            ownerId = id;
+            this.owner = owner;
         }
 
         public void setPosition(int position)
         {
             this.position = position;
         }
+
+        public UnPlayer getOwner()
+        {
+            return owner;
+        }
+
+        public int getCardIndex()
+        {
+            return CardIndex;
+        }
+
+        public CardInfo toCardInfo()
+        {
+            return new CardInfo(owner, position, CardIndex);
+        }
+
+        public static GameObject instantiateCard(int CardIndex, GameObject parent)
+        {
+            return Instantiate(GameManager.gameManager.cardPrefab, parent.transform);
+        }
+
+        public void updateCard()
+        {
+
+        }
+
+
 
         // Update is called once per frame
         void Update()
