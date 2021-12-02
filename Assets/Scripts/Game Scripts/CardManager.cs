@@ -10,6 +10,7 @@ namespace Un
     public class CardManager : MonoBehaviourPunCallbacks
     {
         int TurnData = 0, PositionData = 1, PlayerIdData = 2;
+        
 
         public override void OnEnable()
         {
@@ -33,21 +34,40 @@ namespace Un
                 CardInfo ci = findCard(positionDatum, playerIdDatum);
                 if (ci == null)
                     return;
-                GameObject go = ci.instantiateToCard();
-                //ci.getOwner().removeCard(ci.getPosition());
+
                 GameManager gameManager = GameManager.gameManager;
-                Vector3 localPosition = go.GetComponent<Transform>().localPosition;
-                Vector3 newV3 = new Vector3(localPosition.x, localPosition.y, -Card.cards);
-                go.GetComponent<Transform>().localPosition = newV3;
-                gameManager.discardPile.Add(go);
+                GameObject card = ci.getCard();
+                if(card == null)
+                {
+                    card = ci.instantiateToCard();
+                }
+                card.GetComponent<Card>().discard();
                 gameManager.turn = turnDatum;
+            }
+        }
+        public static void updateCardPositions(UnPlayer owner)
+        {
+            Transform transform = GameManager.gameManager.localPlayerDeck.GetComponent<Transform>();
+            for (int i = 0; i < owner.getDeck().Count; i++)
+            {
+                if (owner.getOwnerId() == GameManager.gameManager.localPlayer)
+                {
+                    if (i > transform.childCount)
+                        return;
+                    GameObject child = transform.GetChild(i).gameObject;
+                    if (child != null)
+                    {
+                        child.GetComponent<Card>().getCardInfo().setPosition(i);
+                        child.GetComponent<Card>().setPosition(i);
+                    }
+                }
             }
         }
 
         public CardInfo findCard(int position, int ownerId)
         {
             List<UnPlayer> players = GameManager.gameManager.Players;
-            for (int i = 0; i <= players.Count; i++)
+            for (int i = 0; i < players.Count; i++)
             {
                 foreach (CardInfo ci in players[i].getDeck())
                 {

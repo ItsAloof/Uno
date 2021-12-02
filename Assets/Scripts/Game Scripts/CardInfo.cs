@@ -9,6 +9,7 @@ public class CardInfo
     UnPlayer Owner { get; set; }
     int Position { get; set; }
     int CardIndex { get; set; }
+    GameObject card { get; set; }
     public CardInfo(UnPlayer owner, int position, int cardIndex)
     {
         this.Owner = owner;
@@ -36,9 +37,27 @@ public class CardInfo
         {
             Card cardScript = go.GetComponent<Card>();
             CardInfo ci = cardScript.toCardInfo();
+            cardScript.setCardInfo(ci);
             scripts.Add(ci);
         }
         return scripts;
+    }
+
+    public void setCard(GameObject card)
+    {
+        this.card = card;
+    }
+
+    public GameObject getCard()
+    {
+        return card;
+    }
+
+    public Card getCardScript()
+    {
+        if (card == null)
+            return null;
+        return card.GetComponent<Card>();
     }
 
     public UnPlayer getOwner()
@@ -63,8 +82,22 @@ public class CardInfo
 
     public GameObject instantiateToCard()
     {
-        GameObject go = Card.instantiateCard(CardIndex, GameObject.FindGameObjectWithTag("Discard"));
+        //Debug.Log($"CardInfo.instantiateToCard: Position = {Position}");
+        GameObject go = Card.instantiateCard(GameObject.FindGameObjectWithTag("Discard"));
         go.GetComponent<SpriteRenderer>().sprite = GameManager.gameManager.Sprites[CardIndex];
+        setCard(go);
+        Card card = getCardScript();
+        card.setPosition(Position);
+        card.setOwner(Owner);
+        card.setCardIndex(CardIndex);
+        card.setCardInfo(this);
         return go;
+    }
+
+    public void discard()
+    {
+        //Debug.Log($"CardInfo.discard(): {Position}");
+        Owner.getDeck().RemoveAt(Position);
+        Owner.updateCardPositions();
     }
 }

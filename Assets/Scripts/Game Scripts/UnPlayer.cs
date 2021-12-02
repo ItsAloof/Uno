@@ -1,3 +1,4 @@
+using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
@@ -47,7 +48,7 @@ public class UnPlayer
 
     public static UnPlayer getUnPlayer(Player player)
     {
-        foreach(UnPlayer unPlayer in GameManager.gameManager.Players)
+        foreach (UnPlayer unPlayer in GameManager.gameManager.Players)
         {
             if (unPlayer.getOwner() == player)
                 return unPlayer;
@@ -62,7 +63,7 @@ public class UnPlayer
             position = 0;
         else
             position = deck.Count;
-        foreach(int index in indices)
+        foreach (int index in indices)
         {
             deck.Add(new CardInfo(this, position, index));
             position++;
@@ -79,17 +80,14 @@ public class UnPlayer
         deck.Add(new CardInfo(this, deck.Count, index));
     }
 
-    public void removeCard(int position)
-    {
-        deck.RemoveAt(position);
-        updateCardPositions();
-    }
-
     public void updateCardPositions()
     {
-        for(int i = 0; i < deck.Count; i++)
+        List<CardInfo> newDeck = new List<CardInfo>();
+        for (int i = 0; i < deck.Count; i++)
         {
-            deck[i].setPosition(i);
+            CardInfo ci = deck[i];
+            ci.setPosition(i);
+            deck[i] = ci;
         }
     }
 
@@ -111,5 +109,10 @@ public class UnPlayer
     public GameObject getRemotePlayerInfo()
     {
         return RemotePlayerInfo;
+    }
+
+    public CardInfo getCard(int position)
+    {
+        return deck[position];
     }
 }

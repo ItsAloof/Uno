@@ -22,7 +22,7 @@ namespace Un
 
         [Tooltip("The local players deck area")]
         [SerializeField]
-        GameObject localPlayerDeck;
+        public GameObject localPlayerDeck;
 
         [Tooltip("Used for adding decks that represent remote players in-game")]
         [SerializeField]
@@ -37,9 +37,9 @@ namespace Un
         [SerializeField]
         GameObject remotePlayerInfo;
 
-        [Tooltip("The player decks in order of how they appear where 0")]
+        [Tooltip("The players decks in order of how they appear where 0")]
         [SerializeField]
-        List<GameObject> playerDeck = new List<GameObject>();
+        public List<GameObject> playerDeck = new List<GameObject>();
         #endregion
 
         #region Private Fields
@@ -50,6 +50,7 @@ namespace Un
         #endregion
 
         #region Public Fields
+
         public List<UnPlayer> Players = new List<UnPlayer>();
 
         public int localPlayer;
@@ -59,6 +60,10 @@ namespace Un
         public int direction = 1;
         public int playerIndex;
         public List<GameObject> discardPile = new List<GameObject>();
+
+        public List<GameObject> localPlayerCards = new List<GameObject>();
+        public List<GameObject> remotePlayerCards = new List<GameObject>();
+
         #endregion
 
         #region Public Static Fields
@@ -80,8 +85,12 @@ namespace Un
                 Players.Add(unPlayer);
                 if (players[i].IsMasterClient)
                     localPlayer = i;
+                else if(players[i] == PhotonNetwork.LocalPlayer)
+                {
+                    localPlayer = i;
+                }
+
             }
-            //Camera.main.depthTextureMode = DepthTextureMode.Depth;
             if (PhotonNetwork.IsConnected)
             {
                 startGame();
@@ -92,28 +101,6 @@ namespace Un
         #endregion
 
         #region Private Functions CardGeneration
-
-        //private List<GameObject> generateCards(Player player, GameObject parent, int owner)
-        //{
-        //    List<GameObject> generatedCards = new List<GameObject>();
-        //    for (int i = 0; i < 7; i++)
-        //    {
-        //        GameObject cardGo = Instantiate(cardPrefab, parent.transform);
-        //    redo:
-        //        int cI = Random.Range(0, Sprites.Length);
-        //        if (taken.Contains(cI))
-        //            goto redo;
-        //        cardGo.GetComponent<SpriteRenderer>().sprite = Sprites[cI];
-        //        deckIndices.Add(cI);
-        //        Vector3 v3 = cardGo.GetComponent<Transform>().position;
-        //        cardGo.GetComponent<Card>().setOwner(player, owner);
-        //        cardGo.GetComponent<Card>().setPosition(i);
-        //        Vector3 newV3 = new Vector3(-300 + i * 100, v3.y + 150, 0 - i * 2);
-        //        cardGo.GetComponent<Transform>().localPosition = newV3;
-        //        generatedCards.Add(cardGo);
-        //    }
-        //    return generatedCards;
-        //}
 
         private int[] generateCardIndices()
         {
@@ -154,6 +141,7 @@ namespace Un
             }
             return generatedCards;
         }
+
 
         public GameObject createCard(int index, Player owner, int ownerId, GameObject parent)
         {
@@ -235,6 +223,7 @@ namespace Un
             if (player == PhotonNetwork.LocalPlayer)
             {
                 List<GameObject> cards = generateCards(player, localPlayerDeck, indexList.ToArray(), playerIndex);
+                playerDeck = cards;
                 UnPlayer unPlayer = UnPlayer.getUnPlayer(player);
                 unPlayer.addCards(CardInfo.getCards(cards));
                 Players[playerIndex] = unPlayer;

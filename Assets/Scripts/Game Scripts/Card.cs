@@ -19,9 +19,11 @@ namespace Un
         int number { get; set; }
         Transform parent;
         GameManager gameManager;
-        private int position { get; set; }
+        [SerializeField]
+        public int position;
         private int CardIndex { get; set; }
-        int TurnData = 0, PositionData = 1, PlayerIdData = 2;
+        CardInfo cardInfo { get; set; }
+        //int TurnData = 0, PositionData = 1, PlayerIdData = 2;
 
 
         // Start is called before the first frame update
@@ -30,36 +32,36 @@ namespace Un
             gameManager = GameManager.gameManager;
         }
 
-        public override void OnEnable()
-        {
-            PhotonNetwork.NetworkingClient.EventReceived += NetworkingClient_EventReceived;
-        }
+        //public override void OnEnable()
+        //{
+        //    PhotonNetwork.NetworkingClient.EventReceived += NetworkingClient_EventReceived;
+        //}
 
-        public override void OnDisable()
-        {
-            PhotonNetwork.NetworkingClient.EventReceived -= NetworkingClient_EventReceived;
-        }
+        //public override void OnDisable()
+        //{
+        //    PhotonNetwork.NetworkingClient.EventReceived -= NetworkingClient_EventReceived;
+        //}
 
-        private void NetworkingClient_EventReceived(EventData obj)
-        {
-            if (obj.Code == EventCodes.MOVE_CARD_EVENT)
-            {
-                if (isDiscarded)
-                    return;
-                object[] data = (object[])obj.CustomData;
-                int positionDatum = (int)data[PositionData];
-                int turnDatum = (int)data[TurnData];
-                int playerIdDatum = (int)data[PlayerIdData];
-                if (owner == null)
-                    return;
-                if (owner.getOwnerId() == playerIdDatum && position == positionDatum)
-                {
-                    discard(GameObject.FindGameObjectWithTag("Discard").transform);
-                    //owner.removeCard(position);
-                    gameManager.turn = turnDatum;
-                }
-            }
-        }
+        //private void NetworkingClient_EventReceived(EventData obj)
+        //{
+        //    if (obj.Code == EventCodes.MOVE_CARD_EVENT)
+        //    {
+        //        if (isDiscarded)
+        //            return;
+        //        object[] data = (object[])obj.CustomData;
+        //        int positionDatum = (int)data[PositionData];
+        //        int turnDatum = (int)data[TurnData];
+        //        int playerIdDatum = (int)data[PlayerIdData];
+        //        if (owner == null)
+        //            return;
+        //        if (owner.getOwnerId() == playerIdDatum && position == positionDatum)
+        //        {
+        //            discard(GameObject.FindGameObjectWithTag("Discard").transform);
+        //            //owner.removeCard(position);
+        //            gameManager.turn = turnDatum;
+        //        }
+        //    }
+        //}
 
         private void OnMouseEnter()
         {
@@ -82,23 +84,27 @@ namespace Un
         {
             if (isDiscarded || PhotonNetwork.LocalPlayer != owner.getOwner() || gameManager.turn != owner.getOwnerId())
                 return;
-            GameObject go = GameObject.FindGameObjectWithTag("Discard");
             gameManager.turn += gameManager.direction;
             if (gameManager.turn == gameManager.Players.Count)
             {
                 gameManager.turn = 0;
             }
             object[] data = new object[] { gameManager.turn, position, owner.getOwnerId() };
-            discard(go.transform);
+            //Debug.Log($"OnMoveCard: position = {position}");
+            discard();
             PhotonNetwork.RaiseEvent(EventCodes.MOVE_CARD_EVENT, data, RaiseEventOptions.Default, SendOptions.SendReliable);
         }
 
-        private void discard(Transform parent)
+        public void discard()
         {
-            Vector3 v = new Vector3(0, 0, -cards);
-            this.transform.SetParent(parent, false);
+            Vector3 v = new Vector3(0, 0, -GameManager.gameManager.discardPile.Count);
+            cardInfo.discard();
+            this.transform.SetParent(GameObject.FindGameObjectWithTag("Discard").transform, false);
             isDiscarded = true;
             this.transform.localPosition = v;
+            //Debug.Log($"Card.discard(): {position}");
+            GameManager.gameManager.discardPile.Add(this.gameObject);
+            CardManager.updateCardPositions(owner);
             cards++;
         }
 
@@ -117,6 +123,16 @@ namespace Un
             return owner;
         }
 
+        public void setCardInfo(CardInfo cardInfo)
+        {
+            this.cardInfo = cardInfo;
+        }
+
+        public CardInfo getCardInfo()
+        {
+            return cardInfo;
+        }
+
         public int getCardIndex()
         {
             return CardIndex;
@@ -127,9 +143,14 @@ namespace Un
             return new CardInfo(owner, position, CardIndex);
         }
 
-        public static GameObject instantiateCard(int CardIndex, GameObject parent)
+        public static GameObject instantiateCard(GameObject parent)
         {
             return Instantiate(GameManager.gameManager.cardPrefab, parent.transform);
+        }
+
+        public void setCardIndex(int cardIndex)
+        {
+            this.CardIndex = cardIndex;
         }
 
         public void updateCard()
