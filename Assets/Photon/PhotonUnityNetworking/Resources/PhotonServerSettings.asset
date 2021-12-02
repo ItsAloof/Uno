@@ -41,6 +41,7 @@ MonoBehaviour:
   - RespawnSpaceship
   - generateCards
   - receiveCards
+  - drawCard
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

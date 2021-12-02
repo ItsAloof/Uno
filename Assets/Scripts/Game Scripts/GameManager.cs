@@ -58,7 +58,6 @@ namespace Un
         public Player currentTurn;
         public int turn = 0;
         public int direction = 1;
-        public int playerIndex;
         public List<GameObject> discardPile = new List<GameObject>();
 
         public List<GameObject> localPlayerCards = new List<GameObject>();
@@ -117,38 +116,45 @@ namespace Un
             return indices.ToArray();
         }
 
-        private List<GameObject> generateCards(Player player, GameObject parent, int[] indexes, int owner)
+        private List<GameObject> generateCards(Player player, GameObject parent, int[] indexes, int owner, int index = 0)
         {
             List<GameObject> generatedCards = new List<GameObject>();
-            int position = 0;
+            int position = index;
             foreach (int i in indexes)
             {
-                GameObject cardGo = createCard(i, player, owner, parent);
-                cardGo.GetComponent<Card>().setPosition(position);
-                Vector3 localPosition = cardGo.GetComponent<Transform>().localPosition;
-                Vector3 newV3 = new Vector3(localPosition.x, localPosition.y, 0 - position * 2);
-                //if (PhotonNetwork.LocalPlayer != player)
-                //{
-                //    newV3 = new Vector3(-300 + j * 100, v3.y - 150, 0 - position * 2);
-                //}
-                //else
-                //{
-                //    newV3 = new Vector3(-300 + j * 100, v3.y + 150, 0 - position * 2);
-                //}
-                cardGo.GetComponent<Transform>().localPosition = newV3;
+                GameObject cardGo = createCard(i, player, parent, position);
                 generatedCards.Add(cardGo);
                 position++;
             }
             return generatedCards;
         }
 
+        public CardInfo drawCard(Player player)
+        {
+            GameObject card = null;
+            do
+            {
+                int index = Random.Range(0, Sprites.Length);
+                if(!taken.Contains(index))
+                {
+                    UnPlayer unPlayer = UnPlayer.getUnPlayer(player);
+                    return new CardInfo(unPlayer, unPlayer.getDeck().Count, index);
+                }
+            } while(card == null);
+            return null;
+        }
 
-        public GameObject createCard(int index, Player owner, int ownerId, GameObject parent)
+
+        public GameObject createCard(int index, Player owner, GameObject parent, int position)
         {
             GameObject cardGo = Instantiate(cardPrefab, parent.transform);
             cardGo.GetComponent<SpriteRenderer>().sprite = Sprites[index];
             Vector3 v3 = cardGo.GetComponent<Transform>().position;
             cardGo.GetComponent<Card>().setOwner(UnPlayer.getUnPlayer(owner));
+            cardGo.GetComponent<Card>().setPosition(position);
+            Vector3 localPosition = cardGo.GetComponent<Transform>().localPosition;
+            Vector3 newV3 = new Vector3(localPosition.x, localPosition.y, -position);
+            cardGo.GetComponent<Transform>().localPosition = newV3;
             return cardGo;
         }
         #endregion
@@ -158,31 +164,8 @@ namespace Un
         public void startGame()
         {
             Player[] players = PhotonNetwork.PlayerList;
-            //for(int i = 0; i < players.Length; i++)
-            //{
-            //    Player player = players[i];
-            //    Players.Add(player, new List<Card>());
-            //    if (player == PhotonNetwork.LocalPlayer)
-            //        playerIndex = i;
-            //}
-            //Players.p(PhotonNetwork.PlayerList, new List<Card>());
             if (PhotonNetwork.IsMasterClient)
             {
-                //int[] masterIndices = generateCardIndices();
-                //sendGeneratedCards(ToObjArr(masterIndices), players[0], RpcTarget.All, playerIndex);
-                //for (int i = 0; i < Players.Count; i++)
-                //{
-                //    if (players[i].IsMasterClient)
-                //        continue;
-                //    else
-                //    {
-                //        int[] indices = generateCardIndices();
-                //        Debug.Log("Sending cards...");
-                //        foreach (int index in indices)
-                //            Debug.Log($"Index: {index}");
-                //        sendGeneratedCards(ToObjArr(indices), players[i], RpcTarget.All, i);
-                //    }
-                //}
                 for(int i = 0; i < players.Length; i++)
                 {
                     sendGeneratedCards(ToObjArr(generateCardIndices()), players[i], RpcTarget.All, i);
@@ -208,6 +191,14 @@ namespace Un
             photonView.RPC("receiveCards", target, player, indices, PlayerIndex);
         }
 
+        public void onDrawCard()
+        {
+            if (turn != localPlayer)
+                return;
+
+            photonView.RPC("drawCard", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer, localPlayer);
+        }
+
         #endregion
 
         #region PunRPC
@@ -222,38 +213,45 @@ namespace Un
 
             if (player == PhotonNetwork.LocalPlayer)
             {
-                List<GameObject> cards = generateCards(player, localPlayerDeck, indexList.ToArray(), playerIndex);
-                playerDeck = cards;
                 UnPlayer unPlayer = UnPlayer.getUnPlayer(player);
+                List<GameObject> cards = generateCards(player, localPlayerDeck, indexList.ToArray(), playerIndex, unPlayer.getDeck().Count);
+                playerDeck = cards;
                 unPlayer.addCards(CardInfo.getCards(cards));
                 Players[playerIndex] = unPlayer;
             }
             else if (!player.Equals(PhotonNetwork.LocalPlayer))
             {
-                //generateCards(player, remotePlayers[remotePlayers.Length - 1], indexList.ToArray(), Players.FindIndex(p => p == player));
                 if(remotePlayerInfo != null && remotePlayerRegion != null)
                 {
                     UnPlayer unPlayer = UnPlayer.getUnPlayer(player);
                     if (unPlayer != null)
                     {
-                        GameObject RemotePlayerInfo = Instantiate(remotePlayerInfo, remotePlayerRegion.transform);
-                        unPlayer.addCards(CardInfo.generateCardList(indexList, unPlayer, 0));
+                        if(unPlayer.getRemotePlayerInfo() == null)
+                        {
+                            GameObject RemotePlayerInfo = Instantiate(remotePlayerInfo, remotePlayerRegion.transform);
+                            unPlayer.setRemotePlayerInfo(RemotePlayerInfo);
+                        }
+                        unPlayer.addCards(CardInfo.generateCardList(indexList, unPlayer, unPlayer.getDeck().Count));
                         Players[playerIndex] = unPlayer;
                     }
                 }
             }
         }
+
+        [PunRPC]
+        void drawCard(Player player, int playerIndex)
+        {
+            if(Players[localPlayer].getOwner().IsMasterClient)
+            {
+                if (turn == playerIndex)
+                {
+                    CardInfo ci = drawCard(player);
+                    object[] index = { ci.getCardIndex() };
+                    sendGeneratedCards(index, player, RpcTarget.All, playerIndex);
+                }
+            }
+        }
         #endregion
-
-        
-
-        //public override void OnPlayerLeftRoom(Player otherPlayer)
-        //{
-        //    if (Players.Contains(otherPlayer))
-        //    {
-        //        Players.Remove(otherPlayer);
-        //    }
-        //}
 
     }
 }

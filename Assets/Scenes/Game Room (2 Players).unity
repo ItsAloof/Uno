@@ -1493,6 +1493,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1221425346}
   m_CullTransparentMesh: 1
+--- !u!114 &1275022529 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6975905746033730306, guid: b28299512ffa5ec449b1359c83151fe3,
+    type: 3}
+  m_PrefabInstance: {fileID: 1751259285}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28a194ca547f9f149a82b95df63686d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1412154939
 GameObject:
   m_ObjectHideFlags: 0
@@ -2206,7 +2218,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1748364946}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1275022529}
+        m_TargetAssemblyTypeName: Un.GameManager, Assembly-CSharp
+        m_MethodName: onDrawCard
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1748364946
 MonoBehaviour:
   m_ObjectHideFlags: 0

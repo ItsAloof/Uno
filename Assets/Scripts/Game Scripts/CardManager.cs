@@ -45,6 +45,8 @@ namespace Un
                 gameManager.turn = turnDatum;
             }
         }
+
+        
         public static void updateCardPositions(UnPlayer owner)
         {
             Transform transform = GameManager.gameManager.localPlayerDeck.GetComponent<Transform>();
@@ -59,6 +61,8 @@ namespace Un
                     {
                         child.GetComponent<Card>().getCardInfo().setPosition(i);
                         child.GetComponent<Card>().setPosition(i);
+                        Vector3 v3 = new Vector3(0, 0, -i);
+                        child.transform.localPosition = v3;
                     }
                 }
             }

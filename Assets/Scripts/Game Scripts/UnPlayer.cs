@@ -91,6 +91,11 @@ public class UnPlayer
         }
     }
 
+    public void setRemotePlayerInfo(GameObject remotePlayerInfo)
+    {
+        this.RemotePlayerInfo = remotePlayerInfo;
+    }
+
     public Player getOwner()
     {
         return owner;
