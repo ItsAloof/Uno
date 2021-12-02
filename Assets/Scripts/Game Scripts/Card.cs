@@ -14,54 +14,36 @@ namespace Un
         float oldZPosition;
         bool isDiscarded = false;
         UnPlayer owner { get; set; }
+        [SerializeField]
+        string Color;
+        //string Color { get; set; }
+        [SerializeField]
+        int Number;
+        //int Number { get; set; }
+        [SerializeField]
+        bool IsWild = false;
+        [SerializeField]
+        bool IsReverse = false;
+        [SerializeField]
+        bool IsSkip = false;
+        //bool IsWild { get; set; } = false;
+        //bool IsReverse { get; set; } = false;
+        //bool IsSkip { get; set; } = false;
+        [SerializeField]
+        int PlusCards = 0;
 
-        string color { get; set; }
-        int number { get; set; }
         Transform parent;
         GameManager gameManager;
         [SerializeField]
         public int position;
         private int CardIndex { get; set; }
         CardInfo cardInfo { get; set; }
-        //int TurnData = 0, PositionData = 1, PlayerIdData = 2;
 
 
-        // Start is called before the first frame update
         void Start()
         {
             gameManager = GameManager.gameManager;
         }
-
-        //public override void OnEnable()
-        //{
-        //    PhotonNetwork.NetworkingClient.EventReceived += NetworkingClient_EventReceived;
-        //}
-
-        //public override void OnDisable()
-        //{
-        //    PhotonNetwork.NetworkingClient.EventReceived -= NetworkingClient_EventReceived;
-        //}
-
-        //private void NetworkingClient_EventReceived(EventData obj)
-        //{
-        //    if (obj.Code == EventCodes.MOVE_CARD_EVENT)
-        //    {
-        //        if (isDiscarded)
-        //            return;
-        //        object[] data = (object[])obj.CustomData;
-        //        int positionDatum = (int)data[PositionData];
-        //        int turnDatum = (int)data[TurnData];
-        //        int playerIdDatum = (int)data[PlayerIdData];
-        //        if (owner == null)
-        //            return;
-        //        if (owner.getOwnerId() == playerIdDatum && position == positionDatum)
-        //        {
-        //            discard(GameObject.FindGameObjectWithTag("Discard").transform);
-        //            //owner.removeCard(position);
-        //            gameManager.turn = turnDatum;
-        //        }
-        //    }
-        //}
 
         private void OnMouseEnter()
         {
@@ -84,15 +66,31 @@ namespace Un
         {
             if (isDiscarded || PhotonNetwork.LocalPlayer != owner.getOwner() || gameManager.turn != owner.getOwnerId())
                 return;
-            gameManager.turn += gameManager.direction;
-            if (gameManager.turn == gameManager.Players.Count)
+
+            if(canPlay())
             {
-                gameManager.turn = 0;
+                if (IsReverse)
+                    gameManager.direction = -gameManager.direction;
+                if(IsSkip)
+                {
+                    gameManager.turn += gameManager.direction * 2;
+                }
+                else if(!IsSkip)
+                {
+                    gameManager.turn += gameManager.direction;
+                }
+                if (gameManager.turn >= gameManager.Players.Count)
+                {
+                    gameManager.turn = 0;
+                }
+                if(gameManager.turn < 0)
+                {
+                    gameManager.turn = gameManager.Players.Count-1;
+                }
+                object[] data = new object[] { gameManager.turn, position, owner.getOwnerId(), gameManager.direction };
+                discard();
+                PhotonNetwork.RaiseEvent(EventCodes.MOVE_CARD_EVENT, data, RaiseEventOptions.Default, SendOptions.SendReliable);
             }
-            object[] data = new object[] { gameManager.turn, position, owner.getOwnerId() };
-            //Debug.Log($"OnMoveCard: position = {position}");
-            discard();
-            PhotonNetwork.RaiseEvent(EventCodes.MOVE_CARD_EVENT, data, RaiseEventOptions.Default, SendOptions.SendReliable);
         }
 
         public void discard()
@@ -102,15 +100,47 @@ namespace Un
             this.transform.SetParent(GameObject.FindGameObjectWithTag("Discard").transform, false);
             isDiscarded = true;
             this.transform.localPosition = v;
-            //Debug.Log($"Card.discard(): {position}");
             GameManager.gameManager.discardPile.Add(this.gameObject);
             CardManager.updateCardPositions(owner);
             cards++;
         }
 
+        public bool canPlay()
+        {
+            if (gameManager.discardPile.Count == 0)
+                return true;
+            GameObject lastCard = gameManager.discardPile[gameManager.discardPile.Count-1];
+            Card card = lastCard.GetComponent<Card>();
+            if(card.getColor() == Color || card.getNumber() == Number || IsWild)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public void setOwner(UnPlayer owner)
         {
             this.owner = owner;
+        }
+
+        public void setColor(string color)
+        {
+            this.Color = color;
+        }
+
+        public string getColor()
+        {
+            return Color;
+        }
+
+        public void setNumber(int number)
+        {
+            this.Number = number;
+        }
+
+        public int getNumber()
+        {
+            return Number;
         }
 
         public void setPosition(int position)
@@ -140,7 +170,7 @@ namespace Un
 
         public CardInfo toCardInfo()
         {
-            return new CardInfo(owner, position, CardIndex);
+            return new CardInfo(owner, position, CardIndex, Color, Number);
         }
 
         public static GameObject instantiateCard(GameObject parent)
@@ -153,16 +183,22 @@ namespace Un
             this.CardIndex = cardIndex;
         }
 
-        public void updateCard()
+        public void isWild(bool isWild)
         {
-
+            IsWild = isWild;
+        }
+        public void isSkip(bool isSkip)
+        {
+            IsSkip = isSkip;
+        }
+        public void isReverse(bool isReverse)
+        {
+            IsReverse = isReverse;
         }
 
-
-
-        // Update is called once per frame
-        void Update()
+        public void setPlusCards(int plusCards)
         {
+            this.PlusCards = plusCards;
         }
 
     }

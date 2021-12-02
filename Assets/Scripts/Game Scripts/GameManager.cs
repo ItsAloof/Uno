@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
+using System;
 
 namespace Un
 {
@@ -43,8 +44,9 @@ namespace Un
         #endregion
 
         #region Private Fields
-        
+
         private List<int> deckIndices = new List<int>();
+        [SerializeField]
         List<int> taken = new List<int>();
 
         #endregion
@@ -76,7 +78,7 @@ namespace Un
         // Start is called before the first frame update
         void Start()
         {
-            gameManager = this; 
+            gameManager = this;
             Player[] players = PhotonNetwork.PlayerList;
             for (int i = 0; i < players.Length; i++)
             {
@@ -84,7 +86,7 @@ namespace Un
                 Players.Add(unPlayer);
                 if (players[i].IsMasterClient)
                     localPlayer = i;
-                else if(players[i] == PhotonNetwork.LocalPlayer)
+                else if (players[i] == PhotonNetwork.LocalPlayer)
                 {
                     localPlayer = i;
                 }
@@ -94,7 +96,7 @@ namespace Un
             {
                 startGame();
             }
-            
+
         }
 
         #endregion
@@ -107,7 +109,7 @@ namespace Un
             for (int i = 0; i < 7; i++)
             {
             redo:
-                int index = Random.Range(0, Sprites.Length);
+                int index = UnityEngine.Random.Range(0, Sprites.Length);
                 if (taken.Contains(index))
                     goto redo;
                 taken.Add(index);
@@ -134,13 +136,14 @@ namespace Un
             GameObject card = null;
             do
             {
-                int index = Random.Range(0, Sprites.Length);
-                if(!taken.Contains(index))
+                int index = UnityEngine.Random.Range(0, Sprites.Length);
+                if (!taken.Contains(index))
                 {
+                    taken.Add(index);
                     UnPlayer unPlayer = UnPlayer.getUnPlayer(player);
                     return new CardInfo(unPlayer, unPlayer.getDeck().Count, index);
                 }
-            } while(card == null);
+            } while (card == null);
             return null;
         }
 
@@ -150,12 +153,103 @@ namespace Un
             GameObject cardGo = Instantiate(cardPrefab, parent.transform);
             cardGo.GetComponent<SpriteRenderer>().sprite = Sprites[index];
             Vector3 v3 = cardGo.GetComponent<Transform>().position;
-            cardGo.GetComponent<Card>().setOwner(UnPlayer.getUnPlayer(owner));
-            cardGo.GetComponent<Card>().setPosition(position);
+            Card card = cardGo.GetComponent<Card>();
+            card.setOwner(UnPlayer.getUnPlayer(owner));
+            card.setPosition(position);
+            int? number;
+            string color;
+            bool isWild, isReverse, isSkip;
+            int plusCards;
+            getCardValues(Sprites[index], out color, out number, out isWild, out isReverse, out isSkip, out plusCards);
+            card.setColor(color);
+            if (number != null)
+                card.setNumber((int)number);
+            else
+                card.setNumber(-1);
+            if(isWild)
+                card.isWild(isWild);
+            if(isReverse)
+                card.isReverse(isReverse);
+            if(isSkip)
+                card.isSkip(isSkip);
+            card.setPlusCards(plusCards);
             Vector3 localPosition = cardGo.GetComponent<Transform>().localPosition;
             Vector3 newV3 = new Vector3(localPosition.x, localPosition.y, -position);
             cardGo.GetComponent<Transform>().localPosition = newV3;
             return cardGo;
+        }
+
+        public static void getCardValues(Sprite sprite, out string color, out int? number, out bool isWild, out bool isReverse, out bool isSkip, out int plusCards)
+        {
+            plusCards = 0;
+            string name = sprite.name;
+            bool wild = false, reverse = false, skip = false;
+            switch (name[0])
+            {
+                case 'r':
+                    color = "red";
+                    break;
+                case 'g':
+                    color = "green";
+                    break;
+                case 'b':
+                    color = "blue";
+                    break;
+                case 'y':
+                    color = "yellow";
+                    break;
+                case 'w':
+                    {
+                        if (name[1] == 'c')
+                            wild = true;
+                        color = "";
+                        break;
+                    }
+                default:
+                    color = "";
+                    break;
+            }
+            try
+            {
+                number = int.Parse(name[1].ToString());
+            }
+            catch (FormatException)
+            {
+                number = null;
+                switch (name[1])
+                {
+                    case 's':
+                        skip = true;
+                        break;
+                    case 'p':
+                        {
+                            try
+                            {
+                                if (name.Length > 2)
+                                {
+                                    plusCards = int.Parse(name[2].ToString());
+                                }
+                                else
+                                {
+                                    plusCards = 2;
+                                }
+                            }
+                            catch (FormatException)
+                            {
+                                break;
+                            }
+                            break;
+                        }
+                    case 'r':
+                        reverse = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            isReverse = reverse;
+            isSkip = skip;
+            isWild = wild;
         }
         #endregion
 
@@ -166,20 +260,17 @@ namespace Un
             Player[] players = PhotonNetwork.PlayerList;
             if (PhotonNetwork.IsMasterClient)
             {
-                for(int i = 0; i < players.Length; i++)
+                for (int i = 0; i < players.Length; i++)
                 {
                     sendGeneratedCards(ToObjArr(generateCardIndices()), players[i], RpcTarget.All, i);
                 }
             }
-
         }
-
-
 
         public object[] ToObjArr(int[] indices)
         {
             List<object> objArr = new List<object>();
-            foreach(int i in indices)
+            foreach (int i in indices)
             {
                 objArr.Add(i);
             }
@@ -221,12 +312,12 @@ namespace Un
             }
             else if (!player.Equals(PhotonNetwork.LocalPlayer))
             {
-                if(remotePlayerInfo != null && remotePlayerRegion != null)
+                if (remotePlayerInfo != null && remotePlayerRegion != null)
                 {
                     UnPlayer unPlayer = UnPlayer.getUnPlayer(player);
                     if (unPlayer != null)
                     {
-                        if(unPlayer.getRemotePlayerInfo() == null)
+                        if (unPlayer.getRemotePlayerInfo() == null)
                         {
                             GameObject RemotePlayerInfo = Instantiate(remotePlayerInfo, remotePlayerRegion.transform);
                             unPlayer.setRemotePlayerInfo(RemotePlayerInfo);
@@ -241,7 +332,7 @@ namespace Un
         [PunRPC]
         void drawCard(Player player, int playerIndex)
         {
-            if(Players[localPlayer].getOwner().IsMasterClient)
+            if (Players[localPlayer].getOwner().IsMasterClient)
             {
                 if (turn == playerIndex)
                 {

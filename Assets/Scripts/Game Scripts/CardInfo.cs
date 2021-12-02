@@ -10,11 +10,25 @@ public class CardInfo
     int Position { get; set; }
     int CardIndex { get; set; }
     GameObject card { get; set; }
+    string Color { get; set; }
+    int Number { get; set; }
+    bool IsWild { get; set; } = false;
+    bool IsReverse { get; set; } = false;
+    bool IsSkip { get; set; } = false;
+    int PlusCards { get; set; } = 0;
     public CardInfo(UnPlayer owner, int position, int cardIndex)
     {
         this.Owner = owner;
         this.Position = position;
         this.CardIndex = cardIndex;
+    }
+    public CardInfo(UnPlayer owner, int position, int cardIndex, string color, int number)
+    {
+        this.Owner = owner;
+        this.Position = position;
+        this.CardIndex = cardIndex;
+        this.Color = color;
+        this.Number = number;
     }
 
 
@@ -24,7 +38,25 @@ public class CardInfo
         int position = startingPosition;
         foreach (int index in indices)
         {
-            cards.Add(new CardInfo(owner, position, index));
+            GameManager gameManager = GameManager.gameManager;
+            int? numOut;
+            int number = -1, plusCards;
+            bool isWild, isReverse, isSkip;
+            string color;
+            GameManager.getCardValues(gameManager.Sprites[index], out color, out numOut, out isWild, out isReverse, out isSkip, out plusCards);
+            if(numOut != null)
+            {
+                number = (int)numOut;
+            }
+            CardInfo ci = new CardInfo(owner, position, index, color, number);
+            if (isWild)
+                ci.isWild(isWild);
+            if (isReverse)
+                ci.isReverse(isReverse);
+            if (isSkip)
+                ci.isSkip(isSkip);
+            ci.setPlusCards(plusCards);
+            cards.Add(ci);
             position++;
         }
         return cards;
@@ -79,10 +111,26 @@ public class CardInfo
     {
         return CardIndex;
     }
+    public void isWild(bool isWild)
+    {
+        IsWild = isWild;
+    }
+    public void isSkip(bool isSkip)
+    {
+        IsSkip = isSkip;
+    }
+    public void isReverse(bool isReverse)
+    {
+        IsReverse = isReverse;
+    }
+
+    public void setPlusCards(int plusCards)
+    {
+        this.PlusCards = plusCards;
+    }
 
     public GameObject instantiateToCard()
     {
-        //Debug.Log($"CardInfo.instantiateToCard: Position = {Position}");
         GameObject go = Card.instantiateCard(GameObject.FindGameObjectWithTag("Discard"));
         go.GetComponent<SpriteRenderer>().sprite = GameManager.gameManager.Sprites[CardIndex];
         setCard(go);
@@ -91,12 +139,17 @@ public class CardInfo
         card.setOwner(Owner);
         card.setCardIndex(CardIndex);
         card.setCardInfo(this);
+        card.setColor(Color);
+        card.setNumber(Number);
+        card.isWild(IsWild);
+        card.isReverse(IsReverse);
+        card.isSkip(IsSkip);
+        card.setPlusCards(PlusCards);
         return go;
     }
 
     public void discard()
     {
-        //Debug.Log($"CardInfo.discard(): {Position}");
         Owner.getDeck().RemoveAt(Position);
         Owner.updateCardPositions();
     }
