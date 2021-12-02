@@ -10,7 +10,7 @@ namespace Un
     public class CardManager : MonoBehaviourPunCallbacks
     {
         int TurnData = 0, PositionData = 1, PlayerIdData = 2;
-        
+        public AudioSource cardSound;
 
         public override void OnEnable()
         {
@@ -34,6 +34,7 @@ namespace Un
                 CardInfo ci = findCard(positionDatum, playerIdDatum);
                 if (ci == null)
                     return;
+                cardSound.Play();
                 GameManager gameManager = GameManager.gameManager;
                 GameObject card = ci.getCard();
                 if(card == null)

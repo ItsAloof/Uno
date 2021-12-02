@@ -65,6 +65,8 @@ namespace Un
         public List<GameObject> localPlayerCards = new List<GameObject>();
         public List<GameObject> remotePlayerCards = new List<GameObject>();
 
+        public AudioSource cardSound;                                                                               //Card Sound Clip
+
         #endregion
 
         #region Public Static Fields
@@ -279,7 +281,7 @@ namespace Un
 
         public void sendGeneratedCards(object[] indices, Player player, RpcTarget target, int PlayerIndex)
         {
-            photonView.RPC("receiveCards", target, player, indices, PlayerIndex);
+            photonView.RPC("receiveCards", target, player, indices, PlayerIndex);            
         }
 
         public void onDrawCard()
@@ -287,7 +289,7 @@ namespace Un
             if (turn != localPlayer)
                 return;
 
-            photonView.RPC("drawCard", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer, localPlayer);
+            photonView.RPC("drawCard", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer, localPlayer);            
         }
 
         #endregion
@@ -306,6 +308,7 @@ namespace Un
             {
                 UnPlayer unPlayer = UnPlayer.getUnPlayer(player);
                 List<GameObject> cards = generateCards(player, localPlayerDeck, indexList.ToArray(), playerIndex, unPlayer.getDeck().Count);
+                cardSound.Play();
                 playerDeck = cards;
                 unPlayer.addCards(CardInfo.getCards(cards));
                 Players[playerIndex] = unPlayer;
@@ -341,7 +344,7 @@ namespace Un
                 {
                     CardInfo ci = drawCard(player);
                     object[] index = { ci.getCardIndex() };
-                    sendGeneratedCards(index, player, RpcTarget.All, playerIndex);
+                    sendGeneratedCards(index, player, RpcTarget.All, playerIndex);                    
                 }
             }
         }

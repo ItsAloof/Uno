@@ -36,6 +36,9 @@ namespace Un
         GameManager gameManager;
         [SerializeField]
         public int position;
+
+        
+
         private int CardIndex { get; set; }
         CardInfo cardInfo { get; set; }
 
@@ -89,6 +92,7 @@ namespace Un
                 }
                 object[] data = new object[] { gameManager.turn, position, owner.getOwnerId(), gameManager.direction };
                 discard();
+                GameManager.gameManager.cardSound.Play();
                 PhotonNetwork.RaiseEvent(EventCodes.MOVE_CARD_EVENT, data, RaiseEventOptions.Default, SendOptions.SendReliable);
             }
         }

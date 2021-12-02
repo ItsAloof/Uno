@@ -505,7 +505,7 @@ AudioSource:
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 128
+  Priority: 122
   DopplerLevel: 1
   MinDistance: 1
   MaxDistance: 500
@@ -3230,9 +3230,9 @@ RectTransform:
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -242.60016, y: 0}
-  m_SizeDelta: {x: -485.20007, y: 343.27}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -248.06, y: 0}
+  m_SizeDelta: {x: -496.12, y: -739.65}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1761841226
 MonoBehaviour:
@@ -3313,7 +3313,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1866639333
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3880,6 +3880,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: CardManager
       objectReference: {fileID: 0}
+    - target: {fileID: 2631881472231345811, guid: 7f419739b7b4f884c9df2b5af0892204,
+        type: 3}
+      propertyPath: cardSound
+      value: 
+      objectReference: {fileID: 1946311599}
     - target: {fileID: 5615287029635318199, guid: 7f419739b7b4f884c9df2b5af0892204,
         type: 3}
       propertyPath: m_RootOrder
