@@ -34,7 +34,6 @@ namespace Un
                 CardInfo ci = findCard(positionDatum, playerIdDatum);
                 if (ci == null)
                     return;
-
                 GameManager gameManager = GameManager.gameManager;
                 GameObject card = ci.getCard();
                 if(card == null)
@@ -42,6 +41,9 @@ namespace Un
                     card = ci.instantiateToCard();
                 }
                 card.GetComponent<Card>().discard();
+                GameObject remoteInfo = ci.getOwner().getRemotePlayerInfo();
+                if (remoteInfo != null)
+                    remoteInfo.GetComponent<PlayerInfo>().setCardCount(ci.getOwner().getDeck().Count);
                 gameManager.turn = turnDatum;
             }
         }

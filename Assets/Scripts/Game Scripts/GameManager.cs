@@ -320,9 +320,12 @@ namespace Un
                         if (unPlayer.getRemotePlayerInfo() == null)
                         {
                             GameObject RemotePlayerInfo = Instantiate(remotePlayerInfo, remotePlayerRegion.transform);
+                            RemotePlayerInfo.GetComponent<PlayerInfo>().setOwnerId(playerIndex);
+                            RemotePlayerInfo.GetComponent<PlayerInfo>().setName(player.NickName);
                             unPlayer.setRemotePlayerInfo(RemotePlayerInfo);
                         }
                         unPlayer.addCards(CardInfo.generateCardList(indexList, unPlayer, unPlayer.getDeck().Count));
+                        unPlayer.getRemotePlayerInfo().GetComponent<PlayerInfo>().setCardCount(unPlayer.getDeck().Count);
                         Players[playerIndex] = unPlayer;
                     }
                 }
