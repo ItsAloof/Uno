@@ -13,7 +13,7 @@ namespace Uno
 
         [Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players")]
         [SerializeField]
-        private byte maxPlayersPerRoom = 2;
+        private byte maxPlayersPerRoom = 7;
 
         [Tooltip("The UI Panel to let the user enter name, connect and play")]
         [SerializeField]
@@ -49,7 +49,8 @@ namespace Uno
         {
             mainMenu.SetActive(true);
             //progressLabel.SetActive(false);
-            chatGUI.SetActive(false);
+            chatGUI.SetActive(true);
+            
         }
 
         // Update is called once per frame
