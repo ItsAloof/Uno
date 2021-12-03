@@ -72,11 +72,17 @@ namespace Un
 
             if(canPlay())
             {
+                CardInfo ci = cardInfo;
                 if (IsReverse)
                     gameManager.direction = -gameManager.direction;
                 if(IsSkip)
                 {
-                    gameManager.turn += gameManager.direction * 2;
+                    gameManager.turn += gameManager.direction;
+                    if (gameManager.turn >= gameManager.Players.Count)
+                        gameManager.turn = 0;
+                    if (gameManager.turn < 0)
+                        gameManager.turn = gameManager.Players.Count-1;
+                    gameManager.turn += gameManager.direction;
                 }
                 else if(!IsSkip)
                 {
