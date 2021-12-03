@@ -141,6 +141,8 @@ MonoBehaviour:
   OwnerId: 0
   PlayerNamText: {fileID: 2791263709096707095}
   CardCountText: {fileID: 2791263708009746321}
+  CurrentTurn: {fileID: 2611964110848094792}
+  NotCurrentTurn: {fileID: 8583442234514615364}
 --- !u!1 &2791263708009746323
 GameObject:
   m_ObjectHideFlags: 0

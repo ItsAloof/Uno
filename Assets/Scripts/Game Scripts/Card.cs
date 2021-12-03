@@ -98,6 +98,7 @@ namespace Un
                 }
                 object[] data = new object[] { gameManager.turn, position, owner.getOwnerId(), gameManager.direction };
                 discard();
+                CardManager.updateTurnIndicator();
                 GameManager.gameManager.cardSound.Play();
                 PhotonNetwork.RaiseEvent(EventCodes.MOVE_CARD_EVENT, data, RaiseEventOptions.Default, SendOptions.SendReliable);
             }

@@ -46,6 +46,27 @@ namespace Un
                 if (remoteInfo != null)
                     remoteInfo.GetComponent<PlayerInfo>().setCardCount(ci.getOwner().getDeck().Count);
                 gameManager.turn = turnDatum;
+                updateTurnIndicator();
+            }
+        }
+
+        public static void updateTurnIndicator()
+        {
+            List<UnPlayer> players = GameManager.gameManager.Players;
+            for(int i = 0; i < players.Count; i++)
+            {
+                if(!players[i].getOwner().IsLocal)
+                {
+                    UnPlayer player = players[i];
+                    PlayerInfo pi = player.getRemotePlayerInfo().GetComponent<PlayerInfo>();
+                    if(pi.isNotTurnIndicatorActive() && GameManager.gameManager.turn == player.getOwnerId())
+                    {
+                        pi.toggleTurnIndicator();
+                    }else if(pi.isTurnIndicatorActive() && GameManager.gameManager.turn != player.getOwnerId())
+                    {
+                        pi.toggleTurnIndicator();
+                    }
+                }
             }
         }
 

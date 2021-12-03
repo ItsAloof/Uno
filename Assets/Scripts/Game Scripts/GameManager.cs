@@ -330,6 +330,7 @@ namespace Un
                         unPlayer.addCards(CardInfo.generateCardList(indexList, unPlayer, unPlayer.getDeck().Count));
                         unPlayer.getRemotePlayerInfo().GetComponent<PlayerInfo>().setCardCount(unPlayer.getDeck().Count);
                         Players[playerIndex] = unPlayer;
+                        CardManager.updateTurnIndicator();
                     }
                 }
             }

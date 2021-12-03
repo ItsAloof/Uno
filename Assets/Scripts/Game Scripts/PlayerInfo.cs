@@ -19,17 +19,13 @@ public class PlayerInfo : MonoBehaviour
 
     [SerializeField]
     Text CardCountText;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    [SerializeField]
+    GameObject CurrentTurn;
+
+    [SerializeField]
+    GameObject NotCurrentTurn;
+
 
     public void setOwnerId(int ownerId)
     {
@@ -56,5 +52,21 @@ public class PlayerInfo : MonoBehaviour
     {
         Name = name;
         PlayerNamText.text = name;
+    }
+
+    public bool isTurnIndicatorActive()
+    {
+        return CurrentTurn.activeSelf;
+    }
+
+    public bool isNotTurnIndicatorActive()
+    {
+        return NotCurrentTurn.activeSelf;
+    }
+
+    public void toggleTurnIndicator()
+    {
+        CurrentTurn.SetActive(!CurrentTurn.activeSelf);
+        NotCurrentTurn.SetActive(!NotCurrentTurn.activeSelf);
     }
 }
