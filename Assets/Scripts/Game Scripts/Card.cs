@@ -217,6 +217,5 @@ namespace Un
     public class EventCodes
     {
         public static byte MOVE_CARD_EVENT = 1;
-        public static byte DRAW_CARD = 2;
     }
 }

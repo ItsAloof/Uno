@@ -98,7 +98,6 @@ namespace Un
             {
                 startGame();
             }
-
         }
 
         #endregion

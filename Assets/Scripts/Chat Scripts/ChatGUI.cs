@@ -8,13 +8,13 @@ using Photon.Chat;
 using ExitGames.Client.Photon;
 using Photon.Realtime;
 using AuthenticationValues = Photon.Chat.AuthenticationValues;
+using System.IO;
 
-namespace Uno
+namespace Un
 {
     public class ChatGUI : MonoBehaviourPunCallbacks, IChatClientListener
     {
         #region Private Fields
-
         string currentChannel = "general";
         bool selectChatField = false;
 
@@ -42,10 +42,12 @@ namespace Uno
         {
             DontDestroyOnLoad(this.gameObject);
 
-#if PHOTON_UNITY_NETWORKING
+//#if PHOTON_UNITY_NETWORKING
             this.chatAppSettings = PhotonNetwork.PhotonServerSettings.AppSettings.GetChatSettings();
-#endif
-
+            //#endif
+            if (PhotonNetwork.InRoom)
+                currentChannel = PhotonNetwork.CurrentRoom.Name;
+            Connect();
         }
 
         // Update is called once per frame
@@ -85,12 +87,10 @@ namespace Uno
 
         public void Connect()
         {
-            Debug.Log($"Initiated connection...");
             UserName = PhotonNetwork.NickName;
             chatClient = new ChatClient(this);
             chatClient.AuthValues = new AuthenticationValues(UserName);
             chatClient.ConnectUsingSettings(chatAppSettings);
-            Debug.Log($"Connected as: {UserName}");
         }
 
         public void OnEnterSend()
@@ -163,7 +163,7 @@ namespace Uno
             Debug.Log("Disconnected from Photon Network");
         }
 
-        public void OnConnected()
+        public override void OnConnected()
         {
             connectedAsText.text = $"Connected as {PhotonNetwork.NickName}";
             chatClient.SetOnlineStatus(ChatUserStatus.Online);
