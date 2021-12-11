@@ -798,6 +798,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9117222445476412904, guid: 9cf67497f739dd54cbcf66d3d1226f20,
         type: 3}
+      propertyPath: chatStartSound
+      value: 
+      objectReference: {fileID: 589895968}
+    - target: {fileID: 9117222445476412904, guid: 9cf67497f739dd54cbcf66d3d1226f20,
+        type: 3}
       propertyPath: connectingText
       value: 
       objectReference: {fileID: 0}

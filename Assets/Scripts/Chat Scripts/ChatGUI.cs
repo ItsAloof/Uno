@@ -28,6 +28,8 @@ namespace Un
         public Text CurrentChannelText;
         public string UserName { get; set; }
 
+        public AudioSource chatStartSound;
+
         #endregion
 
         #region Private Serializable Fields
@@ -48,6 +50,7 @@ namespace Un
             if (PhotonNetwork.InRoom)
                 currentChannel = PhotonNetwork.CurrentRoom.Name;
             Connect();
+            chatStartSound.Play();
         }
 
         // Update is called once per frame
