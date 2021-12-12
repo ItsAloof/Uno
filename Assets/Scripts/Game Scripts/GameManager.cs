@@ -148,6 +148,10 @@ namespace Un
         public CardInfo drawCard(Player player)
         {
             GameObject card = null;
+            if(taken.Count == Sprites.Length)
+            {
+                photonView.RPC("reshuffle", RpcTarget.All);
+            }
             do
             {
                 int index = UnityEngine.Random.Range(0, Sprites.Length);
@@ -160,6 +164,8 @@ namespace Un
             } while (card == null);
             return null;
         }
+
+        
 
 
         public GameObject createCard(int index, Player owner, GameObject parent, int position)
@@ -453,6 +459,24 @@ namespace Un
             this.turn = turn;
             toggleColors(color);
             isColorEnabled = true;
+            CardManager.updateTurnIndicator();
+        }
+
+        [PunRPC]
+        void reshuffle()
+        {
+            for (int i = 0; i < discardPile.Count - 2; i++)
+            {
+                GameObject go = discardPile[i];
+                Card card = go.GetComponent<Card>();
+                CardInfo ci = card.getCardInfo();
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    taken.Remove(ci.getCardIndex());
+                }
+                discardPile.RemoveAt(i);
+                Destroy(go);
+            }
         }
         #endregion
 
