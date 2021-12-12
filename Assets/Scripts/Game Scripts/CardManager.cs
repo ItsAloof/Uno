@@ -9,7 +9,7 @@ namespace Un
 {
     public class CardManager : MonoBehaviourPunCallbacks
     {
-        int TurnData = 0, PositionData = 1, PlayerIdData = 2, DirectionData;
+        int TurnData = 0, PositionData = 1, PlayerIdData = 2, DirectionData = 3;
         public AudioSource cardSound;
 
         public override void OnEnable()
