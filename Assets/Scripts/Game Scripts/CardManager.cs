@@ -9,7 +9,7 @@ namespace Un
 {
     public class CardManager : MonoBehaviourPunCallbacks
     {
-        int TurnData = 0, PositionData = 1, PlayerIdData = 2;
+        int TurnData = 0, PositionData = 1, PlayerIdData = 2, DirectionData;
         public AudioSource cardSound;
 
         public override void OnEnable()
@@ -32,6 +32,8 @@ namespace Un
                 int positionDatum = (int)data[PositionData];
                 int turnDatum = (int)data[TurnData];
                 int playerIdDatum = (int)data[PlayerIdData];
+                int directionDatum = (int)data[DirectionData];
+
                 CardInfo ci = findCard(positionDatum, playerIdDatum);
                 if (ci == null)
                     return;
@@ -47,6 +49,7 @@ namespace Un
                 if (remoteInfo != null)
                     remoteInfo.GetComponent<PlayerInfo>().setCardCount(ci.getOwner().getDeck().Count);
                 gameManager.turn = turnDatum;
+                gameManager.direction = directionDatum;
                 updateTurnIndicator();
             }
         }
