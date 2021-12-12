@@ -57,7 +57,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     public void OnClickLeaveRoom()
     {
         PhotonNetwork.LeaveRoom();
-        if (SceneManager.GetActiveScene().name == "Game Room (2 Players)")
+        if (SceneManager.GetActiveScene().name == "Game")
         {
             SceneManager.LoadScene("Lobby");
         }
@@ -125,7 +125,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     public void OnClickPlayButton()
     {
-        PhotonNetwork.LoadLevel("Game Room (2 Players)");
+        PhotonNetwork.LoadLevel("Game");
         //PhotonNetwork.LoadLevel("Game Room 2");
     }
 
