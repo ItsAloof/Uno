@@ -449,6 +449,7 @@ namespace Un
         void pickColor(string color, int turn)
         {
             discardPile[discardPile.Count - 1].GetComponent<Card>().setColor(color);
+            discardPile[discardPile.Count - 1].GetComponent<Card>().getCardInfo().setColor(color);
             this.turn = turn;
             toggleColors(color);
             isColorEnabled = true;
