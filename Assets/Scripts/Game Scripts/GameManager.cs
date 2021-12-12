@@ -94,9 +94,11 @@ namespace Un
         {
             gameManager = this;
             Player[] players = PhotonNetwork.PlayerList;
+            Debug.Log($"Players in-game: {players.Length}");
             for (int i = 0; i < players.Length; i++)
             {
                 UnPlayer unPlayer = new UnPlayer(players[i], i);
+                Debug.Log($"Player: {players[i].NickName}: Now creating UnPlayer");
                 Players.Add(unPlayer);
                 if (players[i].IsMasterClient)
                     localPlayer = i;
@@ -104,7 +106,6 @@ namespace Un
                 {
                     localPlayer = i;
                 }
-
             }
             if (PhotonNetwork.IsConnected)
             {
@@ -272,9 +273,24 @@ namespace Un
             Player[] players = PhotonNetwork.PlayerList;
             if (PhotonNetwork.IsMasterClient)
             {
-                for (int i = 0; i < players.Length; i++)
+                Debug.Log($"Players: {players.Length}");
+                for(int i = 0; i < Players.Count; i++)
                 {
-                    sendGeneratedCards(ToObjArr(generateCardIndices()), players[i], RpcTarget.All, i);
+                    UnPlayer unplayer = Players[i];
+                    if(unplayer.getOwner().IsLocal)
+                    {
+                        List<int> cardIndices = new List<int>();
+                        cardIndices.AddRange(generateCardIndices());
+                        createDeck(true, unplayer, unplayer.getOwnerId(), cardIndices);
+                        sendGeneratedCards(ToObjArr(cardIndices.ToArray()), unplayer.getOwner(), RpcTarget.Others, unplayer.getOwnerId());
+                    }
+                    else
+                    {
+                        List<int> cardIndices = new List<int>();
+                        cardIndices.AddRange(generateCardIndices());
+                        createDeck(false, unplayer, unplayer.getOwnerId(), cardIndices);
+                        sendGeneratedCards(ToObjArr(cardIndices.ToArray()), unplayer.getOwner(), RpcTarget.Others, unplayer.getOwnerId());
+                    }
                 }
             }
         }
@@ -359,6 +375,37 @@ namespace Un
             yellowButton.SetActive(enable);
         }
 
+        public void createDeck(bool local, UnPlayer unPlayer, int playerIndex, List<int> indexList)
+        {
+            if(local)
+            {
+                Player player = unPlayer.getOwner();
+                List<GameObject> cards = generateCards(player, localPlayerDeck, indexList.ToArray(), playerIndex, unPlayer.getDeck().Count);
+                cardSound.Play();
+                playerDeck = cards;
+                unPlayer.addCards(CardInfo.getCards(cards));
+                Players[playerIndex] = unPlayer;
+            }
+            else
+            {
+                Player player = unPlayer.getOwner();
+                if (unPlayer != null)
+                {
+                    if (unPlayer.getRemotePlayerInfo() == null)
+                    {
+                        GameObject RemotePlayerInfo = Instantiate(remotePlayerInfo, remotePlayerRegion.transform);
+                        RemotePlayerInfo.GetComponent<PlayerInfo>().setOwnerId(playerIndex);
+                        RemotePlayerInfo.GetComponent<PlayerInfo>().setName(player.NickName);
+                        unPlayer.setRemotePlayerInfo(RemotePlayerInfo);
+                    }
+                    unPlayer.addCards(CardInfo.generateCardList(indexList, unPlayer, unPlayer.getDeck().Count));
+                    unPlayer.getRemotePlayerInfo().GetComponent<PlayerInfo>().setCardCount(unPlayer.getDeck().Count);
+                    Players[playerIndex] = unPlayer;
+                    CardManager.updateTurnIndicator();
+                }
+            }
+        }
+
         #endregion
 
         #region PunRPC
@@ -373,32 +420,13 @@ namespace Un
 
             if (player == PhotonNetwork.LocalPlayer)
             {
-                UnPlayer unPlayer = UnPlayer.getUnPlayer(player);
-                List<GameObject> cards = generateCards(player, localPlayerDeck, indexList.ToArray(), playerIndex, unPlayer.getDeck().Count);
-                cardSound.Play();
-                playerDeck = cards;
-                unPlayer.addCards(CardInfo.getCards(cards));
-                Players[playerIndex] = unPlayer;
+                createDeck(true, Players[playerIndex], playerIndex, indexList);
             }
             else if (!player.Equals(PhotonNetwork.LocalPlayer))
             {
                 if (remotePlayerInfo != null && remotePlayerRegion != null)
                 {
-                    UnPlayer unPlayer = UnPlayer.getUnPlayer(player);
-                    if (unPlayer != null)
-                    {
-                        if (unPlayer.getRemotePlayerInfo() == null)
-                        {
-                            GameObject RemotePlayerInfo = Instantiate(remotePlayerInfo, remotePlayerRegion.transform);
-                            RemotePlayerInfo.GetComponent<PlayerInfo>().setOwnerId(playerIndex);
-                            RemotePlayerInfo.GetComponent<PlayerInfo>().setName(player.NickName);
-                            unPlayer.setRemotePlayerInfo(RemotePlayerInfo);
-                        }
-                        unPlayer.addCards(CardInfo.generateCardList(indexList, unPlayer, unPlayer.getDeck().Count));
-                        unPlayer.getRemotePlayerInfo().GetComponent<PlayerInfo>().setCardCount(unPlayer.getDeck().Count);
-                        Players[playerIndex] = unPlayer;
-                        CardManager.updateTurnIndicator();
-                    }
+                    createDeck(false, Players[playerIndex], playerIndex, indexList);
                 }
             }
         }
