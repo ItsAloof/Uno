@@ -38,7 +38,7 @@ namespace Un
                 cardSound.Play();
                 GameManager gameManager = GameManager.gameManager;
                 GameObject card = ci.getCard();
-                if(card == null)
+                if (card == null)
                 {
                     card = ci.instantiateToCard();
                 }
@@ -59,16 +59,19 @@ namespace Un
         public static void updateTurnIndicator()
         {
             List<UnPlayer> players = GameManager.gameManager.Players;
-            for(int i = 0; i < players.Count; i++)
+            for (int i = 0; i < players.Count; i++)
             {
-                if(!players[i].getOwner().IsLocal)
+                if (!players[i].getOwner().IsLocal)
                 {
                     UnPlayer player = players[i];
+                    if (player.getRemotePlayerInfo() == null)
+                        return;
                     PlayerInfo pi = player.getRemotePlayerInfo().GetComponent<PlayerInfo>();
-                    if(pi.isNotTurnIndicatorActive() && GameManager.gameManager.turn == player.getOwnerId())
+                    if (pi.isNotTurnIndicatorActive() && GameManager.gameManager.turn == player.getOwnerId())
                     {
                         pi.toggleTurnIndicator();
-                    }else if(pi.isTurnIndicatorActive() && GameManager.gameManager.turn != player.getOwnerId())
+                    }
+                    else if (pi.isTurnIndicatorActive() && GameManager.gameManager.turn != player.getOwnerId())
                     {
                         pi.toggleTurnIndicator();
                     }
@@ -76,7 +79,7 @@ namespace Un
             }
         }
 
-        
+
         public static void updateCardPositions(UnPlayer owner)
         {
             Transform transform = GameManager.gameManager.localPlayerDeck.GetComponent<Transform>();
