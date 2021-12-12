@@ -30,14 +30,14 @@ public class LayoutManager : MonoBehaviour
 
 
         }
-        else if (cardcount > 7 && cardcount <= 14)
+        else if (cardcount > 7 && cardcount <= 12)
         {
             GridLayoutGroup testing = playerPanel.GetComponent<GridLayoutGroup>();
             Vector2 spacing = new Vector2(-75, 0);
             glg = playerPanel.GetComponent<GridLayoutGroup>();
             glg.spacing = spacing;
         }
-        else if (cardcount > 14)
+        else if (cardcount > 12)
         {
             GridLayoutGroup testing = playerPanel.GetComponent<GridLayoutGroup>();
             Vector2 spacing = new Vector2(-110, 0);
