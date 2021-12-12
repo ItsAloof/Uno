@@ -4,7 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
-
+using UnityEngine.SceneManagement;
 
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
@@ -57,6 +57,10 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     public void OnClickLeaveRoom()
     {
         PhotonNetwork.LeaveRoom();
+        if (SceneManager.GetActiveScene().name == "Game Room (2 Players)")
+        {
+            SceneManager.LoadScene("Lobby");
+        }
     }
 
     public override void OnLeftRoom()
