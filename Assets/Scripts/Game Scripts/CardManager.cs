@@ -15,18 +15,19 @@ namespace Un
         public override void OnEnable()
         {
             PhotonNetwork.NetworkingClient.EventReceived += NetworkingClient_EventReceived;
+            PhotonNetwork.NetworkingClient.EventReceived += Networkingclient_ContinueEvent;
         }
 
         public override void OnDisable()
         {
             PhotonNetwork.NetworkingClient.EventReceived -= NetworkingClient_EventReceived;
+            PhotonNetwork.NetworkingClient.EventReceived -= Networkingclient_ContinueEvent;
         }
 
         private void NetworkingClient_EventReceived(EventData obj)
         {
             if (obj.Code == EventCodes.MOVE_CARD_EVENT)
             {
-
                 object[] data = (object[])obj.CustomData;
                 int positionDatum = (int)data[PositionData];
                 int turnDatum = (int)data[TurnData];
@@ -48,6 +49,11 @@ namespace Un
                 gameManager.turn = turnDatum;
                 updateTurnIndicator();
             }
+        }
+
+        private void Networkingclient_ContinueEvent(EventData obj)
+        {
+
         }
 
         public static void updateTurnIndicator()

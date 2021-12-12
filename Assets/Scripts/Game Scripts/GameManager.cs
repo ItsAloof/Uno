@@ -49,11 +49,23 @@ namespace Un
         [SerializeField]
         List<int> taken = new List<int>();
 
+
+
         #endregion
 
         #region Public Fields
 
+
         public List<UnPlayer> Players = new List<UnPlayer>();
+
+        public bool wildPlayed = false;
+
+        public GameObject redButtton;
+        public GameObject greenButton;
+        public GameObject blueButton;
+        public GameObject yellowButton;
+
+        public bool isColorEnabled = false;
 
         public int localPlayer;
 
@@ -201,8 +213,7 @@ namespace Un
                     break;
                 case 'w':
                     {
-                        if (name[1] == 'c')
-                            wild = true;
+                        wild = true;
                         color = "";
                         break;
                     }
@@ -287,8 +298,65 @@ namespace Un
         {
             if (turn != localPlayer)
                 return;
+            foreach(CardInfo card in Players[localPlayer].getDeck())
+            {
+                if (card.canPlay(discardPile[discardPile.Count - 1].GetComponent<Card>().getCardInfo()))
+                    return;
+            }
 
             photonView.RPC("drawCard", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer, localPlayer);            
+        }
+
+        public void onPickRed()
+        {
+            if (!wildPlayed)
+                return;
+            photonView.RPC("pickColor", RpcTarget.All, "red", this.turn);
+            wildPlayed = false;
+        }
+
+        public void onPickGreen()
+        {
+            if (!wildPlayed)
+                return;
+            photonView.RPC("pickColor", RpcTarget.All, "green", this.turn);
+            wildPlayed = false;
+        }
+
+        public void onPickBlue()
+        {
+            if (!wildPlayed)
+                return;
+            photonView.RPC("pickColor", RpcTarget.All, "blue", this.turn);
+            wildPlayed = false;
+        }
+
+        public void onPickYellow()
+        {
+            if (!wildPlayed)
+                return;
+            photonView.RPC("pickColor", RpcTarget.All, "yellow", this.turn);
+            wildPlayed = false;
+        }
+
+        public void toggleColors(string color)
+        {
+            bool red = (color == "red") ? true : false;
+            bool green = (color == "green") ? true : false;
+            bool blue = (color == "blue") ? true : false;
+            bool yellow = (color == "yellow") ? true : false;
+            redButtton.SetActive(red);
+            greenButton.SetActive(green);
+            blueButton.SetActive(blue);
+            yellowButton.SetActive(yellow);
+        }
+
+        public void toggleColorWheel(bool enable)
+        {
+            redButtton.SetActive(enable);
+            greenButton.SetActive(enable);
+            blueButton.SetActive(enable);
+            yellowButton.SetActive(enable);
         }
 
         #endregion
@@ -347,6 +415,15 @@ namespace Un
                     sendGeneratedCards(index, player, RpcTarget.All, playerIndex);                    
                 }
             }
+        }
+
+        [PunRPC]
+        void pickColor(string color, int turn)
+        {
+            discardPile[discardPile.Count - 1].GetComponent<Card>().setColor(color);
+            this.turn = turn;
+            toggleColors(color);
+            isColorEnabled = true;
         }
         #endregion
 

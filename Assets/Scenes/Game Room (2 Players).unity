@@ -278,11 +278,11 @@ GameObject:
   - component: {fileID: 355266682}
   m_Layer: 5
   m_Name: 'BlueOptionButton '
-  m_TagString: Untagged
+  m_TagString: blue
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &355266681
 RectTransform:
   m_ObjectHideFlags: 0
@@ -345,7 +345,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 355266683}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1275022529}
+        m_TargetAssemblyTypeName: Un.GameManager, Assembly-CSharp
+        m_MethodName: onPickBlue
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &355266683
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1025,11 +1037,11 @@ GameObject:
   - component: {fileID: 822172627}
   m_Layer: 5
   m_Name: RedOptionButton
-  m_TagString: Untagged
+  m_TagString: red
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &822172626
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1092,7 +1104,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 822172628}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1275022529}
+        m_TargetAssemblyTypeName: Un.GameManager, Assembly-CSharp
+        m_MethodName: onPickRed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &822172628
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1959,11 +1983,11 @@ GameObject:
   - component: {fileID: 1668079906}
   m_Layer: 5
   m_Name: YellowOptionButton
-  m_TagString: Untagged
+  m_TagString: yellow
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1668079905
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2026,7 +2050,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1668079907}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1275022529}
+        m_TargetAssemblyTypeName: Un.GameManager, Assembly-CSharp
+        m_MethodName: onPickYellow
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1668079907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2226,6 +2262,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameManager
       objectReference: {fileID: 0}
+    - target: {fileID: 6749669086744812902, guid: b28299512ffa5ec449b1359c83151fe3,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6975905746033730306, guid: b28299512ffa5ec449b1359c83151fe3,
         type: 3}
       propertyPath: chat
@@ -2238,14 +2279,39 @@ PrefabInstance:
       objectReference: {fileID: 1946311599}
     - target: {fileID: 6975905746033730306, guid: b28299512ffa5ec449b1359c83151fe3,
         type: 3}
+      propertyPath: blueButton
+      value: 
+      objectReference: {fileID: 355266680}
+    - target: {fileID: 6975905746033730306, guid: b28299512ffa5ec449b1359c83151fe3,
+        type: 3}
+      propertyPath: colorPanel
+      value: 
+      objectReference: {fileID: 1866639332}
+    - target: {fileID: 6975905746033730306, guid: b28299512ffa5ec449b1359c83151fe3,
+        type: 3}
+      propertyPath: redButtton
+      value: 
+      objectReference: {fileID: 822172625}
+    - target: {fileID: 6975905746033730306, guid: b28299512ffa5ec449b1359c83151fe3,
+        type: 3}
       propertyPath: chatManager
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 6975905746033730306, guid: b28299512ffa5ec449b1359c83151fe3,
         type: 3}
+      propertyPath: greenButton
+      value: 
+      objectReference: {fileID: 1987868240}
+    - target: {fileID: 6975905746033730306, guid: b28299512ffa5ec449b1359c83151fe3,
+        type: 3}
       propertyPath: localPlayer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6975905746033730306, guid: b28299512ffa5ec449b1359c83151fe3,
+        type: 3}
+      propertyPath: yellowButton
+      value: 
+      objectReference: {fileID: 1668079904}
     - target: {fileID: 6975905746033730306, guid: b28299512ffa5ec449b1359c83151fe3,
         type: 3}
       propertyPath: localPlayerDeck
@@ -3099,7 +3165,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1866639333
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3302,11 +3368,11 @@ GameObject:
   - component: {fileID: 1987868242}
   m_Layer: 5
   m_Name: GreenOptionButton
-  m_TagString: Untagged
+  m_TagString: green
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1987868241
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3369,7 +3435,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1987868243}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1275022529}
+        m_TargetAssemblyTypeName: Un.GameManager, Assembly-CSharp
+        m_MethodName: onPickGreen
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1987868243
 MonoBehaviour:
   m_ObjectHideFlags: 0

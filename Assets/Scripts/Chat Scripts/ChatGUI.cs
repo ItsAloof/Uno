@@ -16,7 +16,6 @@ namespace Un
     {
         #region Private Fields
         string currentChannel = "general";
-        bool selectChatField = false;
 
         #endregion
 

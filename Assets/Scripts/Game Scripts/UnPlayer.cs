@@ -92,6 +92,17 @@ namespace Un
             }
         }
 
+        public void updateCardColor(string color, int position)
+        {
+            CardInfo ci = deck[position];
+            if(ci.getPosition() == position)
+            {
+                ci.setColor(color);
+                deck[position] = ci;
+            }
+            
+        }
+
         public void setRemotePlayerInfo(GameObject remotePlayerInfo)
         {
             this.RemotePlayerInfo = remotePlayerInfo;

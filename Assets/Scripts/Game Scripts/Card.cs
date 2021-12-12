@@ -96,13 +96,29 @@ namespace Un
                 {
                     gameManager.turn = gameManager.Players.Count-1;
                 }
-                object[] data = new object[] { gameManager.turn, position, owner.getOwnerId(), gameManager.direction };
+                object[] data;
+                if (IsWild)
+                {
+                    data = new object[] { gameManager.localPlayer, position, owner.getOwnerId(), gameManager.direction };
+                    gameManager.wildPlayed = true;
+                    gameManager.toggleColorWheel(true);
+                }
+                else
+                {
+                    data = new object[] { gameManager.turn, position, owner.getOwnerId(), gameManager.direction };
+                    if(gameManager.isColorEnabled)
+                    {
+                        gameManager.isColorEnabled = false;
+                        gameManager.toggleColorWheel(false);
+                    }
+                }
                 discard();
                 CardManager.updateTurnIndicator();
                 GameManager.gameManager.cardSound.Play();
                 PhotonNetwork.RaiseEvent(EventCodes.MOVE_CARD_EVENT, data, RaiseEventOptions.Default, SendOptions.SendReliable);
             }
         }
+
 
         public void discard()
         {
@@ -122,7 +138,7 @@ namespace Un
                 return true;
             GameObject lastCard = gameManager.discardPile[gameManager.discardPile.Count-1];
             Card card = lastCard.GetComponent<Card>();
-            if(card.getColor() == Color || card.getNumber() == Number || IsWild)
+            if(card.getColor() == Color || (card.getNumber() == Number && Number >= 0) || IsWild || (IsReverse && card.IsReverse) || (IsSkip && card.IsSkip))
             {
                 return true;
             }
@@ -217,5 +233,6 @@ namespace Un
     public class EventCodes
     {
         public static byte MOVE_CARD_EVENT = 1;
+        public static byte CONTINUE_EVENT = 2;
     }
 }

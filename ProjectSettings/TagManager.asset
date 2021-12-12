@@ -7,6 +7,10 @@ TagManager:
   - Deck
   - Bullet
   - Discard
+  - red
+  - green
+  - blue
+  - yellow
   layers:
   - Default
   - TransparentFX

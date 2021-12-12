@@ -129,6 +129,26 @@ public class CardInfo
         this.PlusCards = plusCards;
     }
 
+    public void setColor(string color)
+    {
+        this.Color = color;
+    }
+
+    public string getColor()
+    {
+        return this.Color;
+    }
+
+    public bool canPlay(CardInfo ci)
+    {
+        if(ci.Color == this.Color || (ci.Number == this.Number && ci.Number >= 0))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public GameObject instantiateToCard()
     {
         GameObject go = Card.instantiateCard(GameObject.FindGameObjectWithTag("Discard"));
