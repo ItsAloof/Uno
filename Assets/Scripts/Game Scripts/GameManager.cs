@@ -94,11 +94,9 @@ namespace Un
         {
             gameManager = this;
             Player[] players = PhotonNetwork.PlayerList;
-            Debug.Log($"Players in-game: {players.Length}");
             for (int i = 0; i < players.Length; i++)
             {
                 UnPlayer unPlayer = new UnPlayer(players[i], i);
-                Debug.Log($"Player: {players[i].NickName}: Now creating UnPlayer");
                 Players.Add(unPlayer);
                 if (players[i].IsMasterClient)
                     localPlayer = i;
@@ -148,7 +146,8 @@ namespace Un
         public CardInfo drawCard(Player player)
         {
             GameObject card = null;
-            if(taken.Count == Sprites.Length)
+            Debug.Log($"{Sprites.Length - taken.Count} out of {Sprites.Length} Cards left in draw deck.");
+            if (taken.Count == Sprites.Length)
             {
                 photonView.RPC("reshuffle", RpcTarget.All);
             }
@@ -165,7 +164,7 @@ namespace Un
             return null;
         }
 
-        
+
 
 
         public GameObject createCard(int index, Player owner, GameObject parent, int position)
@@ -176,6 +175,7 @@ namespace Un
             Card card = cardGo.GetComponent<Card>();
             card.setOwner(UnPlayer.getUnPlayer(owner));
             card.setPosition(position);
+            card.setCardIndex(index);
             int? number;
             string color;
             bool isWild, isReverse, isSkip;
@@ -186,11 +186,11 @@ namespace Un
                 card.setNumber((int)number);
             else
                 card.setNumber(-1);
-            if(isWild)
+            if (isWild)
                 card.isWild(isWild);
-            if(isReverse)
+            if (isReverse)
                 card.isReverse(isReverse);
-            if(isSkip)
+            if (isSkip)
                 card.isSkip(isSkip);
             card.setPlusCards(plusCards);
             Vector3 localPosition = cardGo.GetComponent<Transform>().localPosition;
@@ -279,11 +279,10 @@ namespace Un
             Player[] players = PhotonNetwork.PlayerList;
             if (PhotonNetwork.IsMasterClient)
             {
-                Debug.Log($"Players: {players.Length}");
-                for(int i = 0; i < Players.Count; i++)
+                for (int i = 0; i < Players.Count; i++)
                 {
                     UnPlayer unplayer = Players[i];
-                    if(unplayer.getOwner().IsLocal)
+                    if (unplayer.getOwner().IsLocal)
                     {
                         List<int> cardIndices = new List<int>();
                         cardIndices.AddRange(generateCardIndices());
@@ -313,20 +312,20 @@ namespace Un
 
         public void sendGeneratedCards(object[] indices, Player player, RpcTarget target, int PlayerIndex)
         {
-            photonView.RPC("receiveCards", target, player, indices, PlayerIndex);            
+            photonView.RPC("receiveCards", target, player, indices, PlayerIndex);
         }
 
         public void onDrawCard()
         {
-            if (turn != localPlayer)
+            if (turn != localPlayer || discardPile.Count == 0)
                 return;
-            foreach(CardInfo card in Players[localPlayer].getDeck())
+            foreach (CardInfo card in Players[localPlayer].getDeck())
             {
                 if (card.canPlay(discardPile[discardPile.Count - 1].GetComponent<Card>().getCardInfo()))
                     return;
             }
 
-            photonView.RPC("drawCard", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer, localPlayer);            
+            photonView.RPC("drawCard", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer, localPlayer);
         }
 
         public void onPickRed()
@@ -383,7 +382,7 @@ namespace Un
 
         public void createDeck(bool local, UnPlayer unPlayer, int playerIndex, List<int> indexList)
         {
-            if(local)
+            if (local)
             {
                 Player player = unPlayer.getOwner();
                 List<GameObject> cards = generateCards(player, localPlayerDeck, indexList.ToArray(), playerIndex, unPlayer.getDeck().Count);
@@ -446,7 +445,7 @@ namespace Un
                 {
                     CardInfo ci = drawCard(player);
                     object[] index = { ci.getCardIndex() };
-                    sendGeneratedCards(index, player, RpcTarget.All, playerIndex);                    
+                    sendGeneratedCards(index, player, RpcTarget.All, playerIndex);
                 }
             }
         }
@@ -465,18 +464,19 @@ namespace Un
         [PunRPC]
         void reshuffle()
         {
-            for (int i = 0; i < discardPile.Count - 2; i++)
+            for (int i = 0; i < discardPile.Count - 1; i++)
             {
                 GameObject go = discardPile[i];
                 Card card = go.GetComponent<Card>();
                 CardInfo ci = card.getCardInfo();
+                Destroy(go);
                 if (PhotonNetwork.IsMasterClient)
                 {
-                    taken.Remove(ci.getCardIndex());
+                    taken.Remove(card.getCardIndex());
                 }
-                discardPile.RemoveAt(i);
-                Destroy(go);
             }
+            discardPile.RemoveRange(0, discardPile.Count - 1);
+            discardPile[discardPile.Count - 1].transform.localPosition = new Vector3(0, 0, -discardPile.Count);
         }
         #endregion
 

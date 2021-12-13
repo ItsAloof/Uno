@@ -37,9 +37,11 @@ namespace Un
         [SerializeField]
         public int position;
 
-        
 
-        private int CardIndex { get; set; }
+
+        //private int CardIndex { get; set; }
+        [SerializeField]
+        private int CardIndex;
         CardInfo cardInfo { get; set; }
 
 
@@ -138,10 +140,15 @@ namespace Un
                 return true;
             GameObject lastCard = gameManager.discardPile[gameManager.discardPile.Count-1];
             Card card = lastCard.GetComponent<Card>();
-            if(card.getColor() == Color || (card.getNumber() == Number && Number >= 0) || IsWild || (IsReverse && card.IsReverse) || (IsSkip && card.IsSkip))
+            if(card.getColor() == Color || (card.getNumber() == Number && Number >= 0) || 
+                IsWild || (IsReverse && card.IsReverse) || (IsSkip && card.IsSkip))
+            {
+                return true;
+            }else if(PlusCards > 0 && (PlusCards == card.PlusCards))
             {
                 return true;
             }
+
             return false;
         }
 
@@ -228,11 +235,5 @@ namespace Un
             this.PlusCards = plusCards;
         }
 
-    }
-
-    public class EventCodes
-    {
-        public static byte MOVE_CARD_EVENT = 1;
-        public static byte CONTINUE_EVENT = 2;
     }
 }
