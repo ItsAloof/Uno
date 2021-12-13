@@ -1956,8 +1956,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.00042725, y: -168}
-  m_SizeDelta: {x: 795.22, y: 127.4263}
+  m_AnchoredPosition: {x: 0.00042725, y: -175.4159}
+  m_SizeDelta: {x: 795.22, y: 142.2581}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1991316421
 MonoBehaviour:
@@ -1995,6 +1995,8 @@ MonoBehaviour:
   m_Text: 'Gameplay: Nick
 
     Graphics & UI: Charles
+
+    Testing: Joe
 
 '
 --- !u!222 &1991316422
