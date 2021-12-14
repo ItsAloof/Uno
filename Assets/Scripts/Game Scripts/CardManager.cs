@@ -15,13 +15,11 @@ namespace Un
         public override void OnEnable()
         {
             PhotonNetwork.NetworkingClient.EventReceived += NetworkingClient_EventReceived;
-            PhotonNetwork.NetworkingClient.EventReceived += Networkingclient_ContinueEvent;
         }
 
         public override void OnDisable()
         {
             PhotonNetwork.NetworkingClient.EventReceived -= NetworkingClient_EventReceived;
-            PhotonNetwork.NetworkingClient.EventReceived -= Networkingclient_ContinueEvent;
         }
 
         private void NetworkingClient_EventReceived(EventData obj)
@@ -52,11 +50,6 @@ namespace Un
                 gameManager.direction = directionDatum;
                 updateTurnIndicator();
             }
-        }
-
-        private void Networkingclient_ContinueEvent(EventData obj)
-        {
-
         }
 
         public static void updateTurnIndicator()
