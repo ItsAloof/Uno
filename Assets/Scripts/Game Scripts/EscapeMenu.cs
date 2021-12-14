@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class EscapeMenu : MonoBehaviour
 {
     public GameObject escapePanel;
+    public GameObject tablePanel;
 
     // Update is called once per frame
     void Update()
@@ -13,6 +14,7 @@ public class EscapeMenu : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             escapePanel.SetActive(true);
+            tablePanel.SetActive(false);
         }
     }
 }
