@@ -14,7 +14,8 @@ public class EscapeMenu : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             escapePanel.SetActive(true);
-            tablePanel.SetActive(false);
+            
         }
+        
     }
 }
