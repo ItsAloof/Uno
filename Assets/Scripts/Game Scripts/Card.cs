@@ -54,7 +54,7 @@ namespace Un
         private void OnMouseEnter()
         {
             gameManager.clickSound.Play();
-            if (isDiscarded || PhotonNetwork.LocalPlayer != owner.getOwner())
+            if (isDiscarded || PhotonNetwork.LocalPlayer != owner.getPlayer())
                 return;
             Vector3 v = transform.localPosition;
             oldZPosition = v.z;
@@ -63,7 +63,7 @@ namespace Un
 
         private void OnMouseExit()
         {
-            if (isDiscarded || PhotonNetwork.LocalPlayer != owner.getOwner())
+            if (isDiscarded || PhotonNetwork.LocalPlayer != owner.getPlayer())
                 return;
             Vector3 v = transform.localPosition;
             this.transform.localPosition = new Vector3(v.x, v.y, oldZPosition);
@@ -71,7 +71,7 @@ namespace Un
 
         private void OnMouseUpAsButton()
         {
-            if (isDiscarded || PhotonNetwork.LocalPlayer != owner.getOwner() || gameManager.turn != owner.getOwnerId())
+            if (isDiscarded || PhotonNetwork.LocalPlayer != owner.getPlayer() || gameManager.turn != owner.getOwnerId() || gameManager.pickingColor)
                 return;
 
             if(canPlay())
@@ -103,13 +103,14 @@ namespace Un
                 object[] data;
                 if (IsWild)
                 {
-                    data = new object[] { gameManager.localPlayer, position, owner.getOwnerId(), gameManager.direction };
+                    data = new object[] { gameManager.turn, position, owner.getOwnerId(), gameManager.direction, true };
+                    gameManager.pickingColor = true;
                     gameManager.wildPlayed = true;
                     gameManager.toggleColorWheel(true);
                 }
                 else
                 {
-                    data = new object[] { gameManager.turn, position, owner.getOwnerId(), gameManager.direction };
+                    data = new object[] { gameManager.turn, position, owner.getOwnerId(), gameManager.direction, false };
                     if(gameManager.isColorEnabled)
                     {
                         gameManager.isColorEnabled = false;
@@ -117,32 +118,12 @@ namespace Un
                     }
                 }
                 discard();
-                foreach(CardInfo cardIn in gameManager.Players[owner.getOwnerId()].getDeck())
-                {
-                    Debug.Log($"Card {cardIn.getPosition()} is a {cardIn.getColor()} Number={cardIn.getCardNumber()}, PlusCards={cardIn.getPlusCards()}");
-                }
                 CardManager.updateTurnIndicator();
                 GameManager.gameManager.cardSound.Play();
                 PhotonNetwork.RaiseEvent(EventCodes.MOVE_CARD_EVENT, data, RaiseEventOptions.Default, SendOptions.SendReliable);
-
-                if (PhotonNetwork.IsMasterClient && PlusCards > 0 && CardManager.CurrentPlusType == 0)
+                if(PlusCards > 0)
                 {
-                    Debug.Log("Setting current Plus Card count and Type ");
-                    CardManager.CurrentPlusType = PlusCards;
-                    CardManager.CurrentPlusCards = PlusCards;
-                }
-                else if (CardManager.CurrentPlusType == PlusCards)
-                    CardManager.CurrentPlusCards += PlusCards;
-                if (PhotonNetwork.IsMasterClient && PlusCards > 0)
-                {
-                    Debug.Log("On Plus Cards");
-                    CardManager.onPlusCards(gameManager, gameManager.Players[gameManager.turn].getOwner(), gameManager.turn);
-                }
-                else if (PhotonNetwork.IsMasterClient && PlusCards == 0)
-                {
-                    Debug.Log("Resetting Current Plus Card Type and Count");
-                    CardManager.CurrentPlusType = 0;
-                    CardManager.CurrentPlusCards = 0;
+                    gameManager.runPlusCardsEvent(PlusCards);
                 }
             }
         }
@@ -166,6 +147,15 @@ namespace Un
                 return true;
             GameObject lastCard = gameManager.discardPile[gameManager.discardPile.Count-1];
             Card card = lastCard.GetComponent<Card>();
+
+            if(gameManager.PlusCardsActive)
+            {
+                if (gameManager.PlusCardType == PlusCards)
+                    return true;
+                else
+                    return false;
+            }
+
             if(card.getColor() == Color || (card.getNumber() == Number && Number >= 0) || 
                 IsWild || (IsReverse && card.IsReverse) || (IsSkip && card.IsSkip))
             {
@@ -248,17 +238,27 @@ namespace Un
             this.CardIndex = cardIndex;
         }
 
-        public void isWild(bool isWild)
+        public void setWild(bool isWild)
         {
             IsWild = isWild;
         }
-        public void isSkip(bool isSkip)
+        public void setSkip(bool isSkip)
         {
             IsSkip = isSkip;
         }
-        public void isReverse(bool isReverse)
+        public void setReverse(bool isReverse)
         {
             IsReverse = isReverse;
+        }
+
+        public bool isWild()
+        {
+            return IsWild;
+        }
+
+        public bool isSkip()
+        {
+            return IsSkip;
         }
 
         public void setPlusCards(int plusCards)

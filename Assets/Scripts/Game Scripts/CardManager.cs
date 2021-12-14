@@ -10,7 +10,7 @@ namespace Un
 {
     public class CardManager : MonoBehaviourPunCallbacks
     {
-        int TurnData = 0, PositionData = 1, PlayerIdData = 2, DirectionData = 3;
+        int TurnData = 0, PositionData = 1, PlayerIdData = 2, DirectionData = 3, PickingColorData = 4;
         [SerializeField]
         public static int CurrentPlusCards = 0;
         [SerializeField]
@@ -20,13 +20,11 @@ namespace Un
         public override void OnEnable()
         {
             PhotonNetwork.NetworkingClient.EventReceived += NetworkingClient_EventReceived;
-            PhotonNetwork.NetworkingClient.EventReceived += NetworkingClient_TurnEvent;
         }
 
         public override void OnDisable()
         {
             PhotonNetwork.NetworkingClient.EventReceived -= NetworkingClient_EventReceived;
-            PhotonNetwork.NetworkingClient.EventReceived -= NetworkingClient_TurnEvent;
         }
 
         private void NetworkingClient_EventReceived(EventData obj)
@@ -38,6 +36,7 @@ namespace Un
                 int turnDatum = (int)data[TurnData];
                 int playerIdDatum = (int)data[PlayerIdData];
                 int directionDatum = (int)data[DirectionData];
+                bool pickingColorDatum = (bool)data[PickingColorData];
 
                 CardInfo ci = findCard(positionDatum, playerIdDatum);
                 if (ci == null)
@@ -55,66 +54,9 @@ namespace Un
                     remoteInfo.GetComponent<PlayerInfo>().setCardCount(ci.getOwner().getDeck().Count);
                 gameManager.turn = turnDatum;
                 gameManager.direction = directionDatum;
-                updateTurnIndicator();
-                if(PhotonNetwork.IsMasterClient && ci.getPlusCards() > 0 && CurrentPlusCards == 0 && CurrentPlusType == 0)
-                {
-                    CurrentPlusType = ci.getPlusCards();
-                    CurrentPlusCards = ci.getPlusCards();
-                }
-                else if (CardManager.CurrentPlusType == ci.getPlusCards())
-                    CardManager.CurrentPlusCards += ci.getPlusCards();
-                if (PhotonNetwork.IsMasterClient && ci.getPlusCards() > 0 && ci.getPlusCards() == CurrentPlusCards)
-                {
-                    Debug.Log($"Current turn {turnDatum} and person having plus card used against them is {gameManager.Players[turnDatum]}");
-                    if(ci.isWild())
-                    {
-                        onPlusCards(gameManager, gameManager.Players[getNextTurn(turnDatum, directionDatum)].getOwner(), getNextTurn(turnDatum, directionDatum));
-                    }
-                    else
-                    {
-                        onPlusCards(gameManager, gameManager.Players[turnDatum].getOwner(), turnDatum);
-                    }
-                }
-                else if (PhotonNetwork.IsMasterClient)
-                {
-                    CurrentPlusType = 0;
-                    CurrentPlusCards = 0;
-                }
-            }
-        }
-
-        public static void onPlusCards(GameManager gameManager, Player player, int turn)
-        {
-            Debug.Log("Running onPlusCards...");
-            if (gameManager.giveCards(player, UnPlayer.getUnPlayer(player).getOwnerId(), CurrentPlusCards, CurrentPlusType, turn))
-            {
-                Debug.Log("Giving cards to player");
-                gameManager.turn = getNextTurn(gameManager.turn, gameManager.direction);
-                object[] turnData = new object[] { gameManager.turn };
-                PhotonNetwork.RaiseEvent(EventCodes.END_TURN_EVENT, turnData, RaiseEventOptions.Default, SendOptions.SendReliable);
-            }
-        }
-
-        public void NetworkingClient_TurnEvent(EventData obj)
-        {
-            Debug.Log("Skipping player.");
-            if (obj.Code == EventCodes.END_TURN_EVENT)
-            {
-                object[] data = (object[])obj.CustomData;
-                int turnDatum = (int)data[0];
-                GameManager.gameManager.turn = turnDatum;
+                gameManager.pickingColor = pickingColorDatum;
                 updateTurnIndicator();
             }
-        }
-
-        public static int getNextTurn(int turn, int direction)
-        {
-            int next = turn + direction;
-            if (next >= GameManager.gameManager.Players.Count)
-                next = 0;
-            else if (next < 0)
-                next = GameManager.gameManager.Players.Count - 1;
-            return next;
         }
 
         public static void updateTurnIndicator()
@@ -122,7 +64,7 @@ namespace Un
             List<UnPlayer> players = GameManager.gameManager.Players;
             for (int i = 0; i < players.Count; i++)
             {
-                if (!players[i].getOwner().IsLocal)
+                if (!players[i].getPlayer().IsLocal)
                 {
                     UnPlayer player = players[i];
                     if (player.getRemotePlayerInfo() == null)

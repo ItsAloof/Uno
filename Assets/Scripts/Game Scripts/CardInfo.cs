@@ -186,9 +186,9 @@ public class CardInfo
         card.setCardInfo(this);
         card.setColor(Color);
         card.setNumber(Number);
-        card.isWild(IsWild);
-        card.isReverse(IsReverse);
-        card.isSkip(IsSkip);
+        card.setWild(IsWild);
+        card.setReverse(IsReverse);
+        card.setSkip(IsSkip);
         card.setPlusCards(PlusCards);
         return go;
     }

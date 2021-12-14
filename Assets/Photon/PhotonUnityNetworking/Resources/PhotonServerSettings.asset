@@ -44,6 +44,8 @@ MonoBehaviour:
   - drawCard
   - pickColor
   - reshuffle
+  - GivePlusCards
+  - NextTurn
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

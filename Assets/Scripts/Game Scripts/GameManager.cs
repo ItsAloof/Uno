@@ -5,6 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
 using System;
+using ExitGames.Client.Photon;
 
 namespace Un
 {
@@ -80,6 +81,11 @@ namespace Un
         public AudioSource cardSound;
         public AudioSource clickSound;
 
+        int PlusCardTotal { get; set; } = 0;
+        public int PlusCardType { get; set; } = 0;
+        public bool PlusCardsActive = false;
+        public bool pickingColor = false;
+
         #endregion
 
         #region Public Static Fields
@@ -109,6 +115,17 @@ namespace Un
             if (PhotonNetwork.IsConnected)
             {
                 startGame();
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            foreach(UnPlayer player in Players)
+            {
+                if(player.getDeck().Count == 0)
+                {
+                    // GG - You won
+                }
             }
         }
 
@@ -188,11 +205,11 @@ namespace Un
             else
                 card.setNumber(-1);
             if (isWild)
-                card.isWild(isWild);
+                card.setWild(isWild);
             if (isReverse)
-                card.isReverse(isReverse);
+                card.setReverse(isReverse);
             if (isSkip)
-                card.isSkip(isSkip);
+                card.setSkip(isSkip);
             card.setPlusCards(plusCards);
             Vector3 localPosition = cardGo.GetComponent<Transform>().localPosition;
             Vector3 newV3 = new Vector3(localPosition.x, localPosition.y, -position);
@@ -283,19 +300,19 @@ namespace Un
                 for (int i = 0; i < Players.Count; i++)
                 {
                     UnPlayer unplayer = Players[i];
-                    if (unplayer.getOwner().IsLocal)
+                    if (unplayer.getPlayer().IsLocal)
                     {
                         List<int> cardIndices = new List<int>();
                         cardIndices.AddRange(generateCardIndices());
                         createDeck(true, unplayer, unplayer.getOwnerId(), cardIndices);
-                        sendGeneratedCards(ToObjArr(cardIndices.ToArray()), unplayer.getOwner(), RpcTarget.Others, unplayer.getOwnerId());
+                        sendGeneratedCards(ToObjArr(cardIndices.ToArray()), unplayer.getPlayer(), RpcTarget.Others, unplayer.getOwnerId());
                     }
                     else
                     {
                         List<int> cardIndices = new List<int>();
                         cardIndices.AddRange(generateCardIndices());
                         createDeck(false, unplayer, unplayer.getOwnerId(), cardIndices);
-                        sendGeneratedCards(ToObjArr(cardIndices.ToArray()), unplayer.getOwner(), RpcTarget.Others, unplayer.getOwnerId());
+                        sendGeneratedCards(ToObjArr(cardIndices.ToArray()), unplayer.getPlayer(), RpcTarget.Others, unplayer.getOwnerId());
                     }
                 }
             }
@@ -318,7 +335,7 @@ namespace Un
 
         public void onDrawCard()
         {
-            if (turn != localPlayer || discardPile.Count == 0)
+            if (turn != localPlayer || discardPile.Count == 0 || pickingColor)
                 return;
             foreach (CardInfo card in Players[localPlayer].getDeck())
             {
@@ -380,46 +397,48 @@ namespace Un
             blueButton.SetActive(enable);
             yellowButton.SetActive(enable);
         }
-        public bool giveCards(Player player, int playerIndex, int amount, int plusType, int turn)
+
+        public void giveCards(UnPlayer player, int amount)
         {
-            if (Players[localPlayer].getOwner().IsMasterClient)
+            List<int> cards = new List<int>();
+            for(int i = 0; i < amount; i++)
             {
-                Debug.Log("Running giveCards as MasterClient");
-                Debug.Log($"Checking {UnPlayer.getUnPlayer(player).getOwner().NickName}'s deck for matching plus card");
-                foreach (CardInfo cardInfo in Players[playerIndex].getDeck())
-                {
-                    if (cardInfo.getPlusCards() == plusType)
-                    {
-                        if(cardInfo.getCard() != null)
-                        {
-                            if (cardInfo.getCard().GetComponent<Card>().IsDiscarded())
-                                continue;
-                        }    
-                        Debug.Log($"Found matching card Color={cardInfo.getColor()} PlusCards={cardInfo.getPlusCards()}");
-                        return false;
-                    }
-                    Debug.Log($"Card {cardInfo.getPosition()}: Color={cardInfo.getColor()}, Number={cardInfo.getCardNumber()}, PlusCards={cardInfo.getPlusCards()}");
-                }
-                Debug.Log("Didn't Find matching card now giving cards to player.");
-                List<int> cards = new List<int>();
-                for (int i = 0; i < amount; i++)
-                {
-                    cards.Add(drawCard(player).getCardIndex());
-                }
-                object[] index = ToObjArr(cards.ToArray());
-                sendGeneratedCards(index, player, RpcTarget.All, playerIndex);
-                CardManager.CurrentPlusCards = 0;
-                CardManager.CurrentPlusType = 0;
-                return true;
+                cards.Add(drawCard(player.getPlayer()).getCardIndex());
+            }
+            object[] data = ToObjArr(cards.ToArray());
+            sendGeneratedCards(data, player.getPlayer(), RpcTarget.All, player.getOwnerId());
+        }
+
+        public void runPlusCardsEvent(int plusCard)
+        {
+            photonView.RPC("GivePlusCards", RpcTarget.MasterClient, Players[turn].getPlayer(), plusCard, turn, direction); 
+        }
+
+        public bool canStack(int plusCard, UnPlayer player)
+        {
+            foreach(CardInfo ci in player.getDeck())
+            {
+                if (ci.getPlusCards() == plusCard)
+                    return true;
             }
             return false;
+        }
+
+        public static int getNextTurn(int turn, int direction)
+        {
+            int next = turn + direction;
+            if (next >= gameManager.Players.Count)
+                next = 0;
+            else if (next < 0)
+                next = gameManager.Players.Count - 1;
+            return next;
         }
 
         public void createDeck(bool local, UnPlayer unPlayer, int playerIndex, List<int> indexList)
         {
             if (local)
             {
-                Player player = unPlayer.getOwner();
+                Player player = unPlayer.getPlayer();
                 List<GameObject> cards = generateCards(player, localPlayerDeck, indexList.ToArray(), playerIndex, unPlayer.getDeck().Count);
                 cardSound.Play();
                 playerDeck = cards;
@@ -428,7 +447,7 @@ namespace Un
             }
             else
             {
-                Player player = unPlayer.getOwner();
+                Player player = unPlayer.getPlayer();
                 if (unPlayer != null)
                 {
                     if (unPlayer.getRemotePlayerInfo() == null)
@@ -449,6 +468,34 @@ namespace Un
         #endregion
 
         #region PunRPC
+
+
+        [PunRPC]
+        void GivePlusCards(Player target, int plusCard, int turn, int direction)
+        {
+            UnPlayer player = UnPlayer.getUnPlayer(target);
+            PlusCardType = plusCard;
+            PlusCardTotal += plusCard;
+            PlusCardsActive = true;
+            if (!canStack(plusCard, player))
+            {
+                giveCards(player, PlusCardTotal);
+                PlusCardsActive = false;
+                PlusCardTotal = 0;
+                PlusCardType = 0;
+                int next = getNextTurn(turn, direction);
+                photonView.RPC("NextTurn", RpcTarget.All, next);
+                return;
+            }
+        }
+
+        [PunRPC]
+        void NextTurn(int turn)
+        {
+            this.turn = turn;
+            CardManager.updateTurnIndicator();
+        }
+
         [PunRPC]
         void receiveCards(Player player, object[] indices, int playerIndex)
         {
@@ -474,7 +521,7 @@ namespace Un
         [PunRPC]
         void drawCard(Player player, int playerIndex)
         {
-            if (Players[localPlayer].getOwner().IsMasterClient)
+            if (Players[localPlayer].getPlayer().IsMasterClient)
             {
                 if (turn == playerIndex)
                 {
@@ -485,8 +532,6 @@ namespace Un
             }
         }
 
-
-
         [PunRPC]
         void pickColor(string color, int turn)
         {
@@ -496,6 +541,7 @@ namespace Un
             toggleColors(color);
             isColorEnabled = true;
             CardManager.updateTurnIndicator();
+            pickingColor = false;
         }
 
         [PunRPC]

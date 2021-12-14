@@ -10,37 +10,37 @@ namespace Un
     {
         private List<CardInfo> deck { get; set; }
 
-        private Player owner { get; set; }
+        private Player Player { get; set; }
         private int ownerId { get; set; }
         private GameObject RemotePlayerInfo;
         List<GameObject> cards { get; set; }
 
-        public UnPlayer(Player owner, int ownerId)
+        public UnPlayer(Player player, int ownerId)
         {
-            this.owner = owner;
+            this.Player = player;
             this.ownerId = ownerId;
             deck = new List<CardInfo>();
         }
-        public UnPlayer(Player owner, int ownerId, GameObject remotePlayerInfo)
+        public UnPlayer(Player player, int ownerId, GameObject remotePlayerInfo)
         {
-            this.owner = owner;
+            this.Player = player;
             this.ownerId = ownerId;
             this.RemotePlayerInfo = remotePlayerInfo;
             deck = new List<CardInfo>();
         }
 
-        public UnPlayer(Player owner, int ownerId, List<CardInfo> deck)
+        public UnPlayer(Player player, int ownerId, List<CardInfo> deck)
         {
-            this.owner = owner;
+            this.Player = player;
             this.ownerId = ownerId;
             deck = new List<CardInfo>();
             deck.AddRange(deck);
         }
 
 
-        public UnPlayer(Player owner, int ownerId, List<CardInfo> deck, GameObject remotePlayerInfo)
+        public UnPlayer(Player player, int ownerId, List<CardInfo> deck, GameObject remotePlayerInfo)
         {
-            this.owner = owner;
+            this.Player = player;
             this.ownerId = ownerId;
             deck = new List<CardInfo>();
             deck.AddRange(deck);
@@ -51,7 +51,7 @@ namespace Un
         {
             foreach (UnPlayer unPlayer in GameManager.gameManager.Players)
             {
-                if (unPlayer.getOwner() == player)
+                if (unPlayer.getPlayer() == player)
                     return unPlayer;
             }
             return null;
@@ -108,9 +108,9 @@ namespace Un
             this.RemotePlayerInfo = remotePlayerInfo;
         }
 
-        public Player getOwner()
+        public Player getPlayer()
         {
-            return owner;
+            return Player;
         }
 
         public int getOwnerId()
