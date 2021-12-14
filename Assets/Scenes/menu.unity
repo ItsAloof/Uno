@@ -1992,11 +1992,12 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Gameplay: Nick
+  m_Text: 'Gameplay/Scripting: Nick
 
-    Graphics & UI: Charles
+    Graphics/UI & Audio: Charles
 
-    Testing: Joe
+    Testing:
+    Joe & Marilin
 
 '
 --- !u!222 &1991316422
