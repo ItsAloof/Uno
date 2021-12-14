@@ -99,6 +99,7 @@ namespace Un
         // Start is called before the first frame update
         void Start()
         {
+            PhotonNetwork.AutomaticallySyncScene = true;
             gameManager = this;
             Player[] players = PhotonNetwork.PlayerList;
             for (int i = 0; i < players.Length; i++)
@@ -498,6 +499,7 @@ namespace Un
         void NextTurn(int turn)
         {
             this.turn = turn;
+            PlusCardsActive = false;
             CardManager.updateTurnIndicator();
         }
 
