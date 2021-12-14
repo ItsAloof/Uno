@@ -51,6 +51,7 @@ namespace Un
         List<int> taken = new List<int>();
 
         private bool gamestart = false;
+        
 
         #endregion
 
@@ -80,6 +81,9 @@ namespace Un
 
         public AudioSource cardSound;
         public AudioSource clickSound;
+
+        public Text winnerText;
+        public GameObject winnerTextContainer;
 
         int PlusCardTotal { get; set; } = 0;
         public int PlusCardType { get; set; } = 0;
@@ -129,11 +133,20 @@ namespace Un
             {
                 if(player.getDeck().Count == 0)
                 {
+                    winnerText.text = player.getPlayer().NickName + " is the Winner!";
+                    winnerTextContainer.SetActive(true);
+                    StartCoroutine(delayclock());
                     PhotonNetwork.LoadLevel("Game Over");
-                    //ADD SOUND
                 }
-            }         
+            }
+
+            IEnumerator delayclock()
+            {
+                yield return new WaitForSeconds(15);
+            }
         }
+
+        
 
         #endregion
 
