@@ -148,7 +148,7 @@ namespace Un
             GameObject lastCard = gameManager.discardPile[gameManager.discardPile.Count-1];
             Card card = lastCard.GetComponent<Card>();
 
-            if(gameManager.PlusCardsActive)
+            if(card.PlusCards > 0)
             {
                 if (gameManager.PlusCardType == PlusCards)
                     return true;
