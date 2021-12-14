@@ -343,11 +343,11 @@ namespace Un
         {
             if (turn != localPlayer || discardPile.Count == 0 || pickingColor)
                 return;
-            //foreach (CardInfo card in Players[localPlayer].getDeck())
-            //{
-            //    if (card.canPlay(discardPile[discardPile.Count - 1].GetComponent<Card>().getCardInfo()))
-            //        return;
-            //}
+            foreach (CardInfo card in Players[localPlayer].getDeck())
+            {
+                if (card.canPlay(discardPile[discardPile.Count - 1].GetComponent<Card>().getCardInfo()))
+                    return;
+            }
 
             photonView.RPC("drawCard", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer, localPlayer);
         }
