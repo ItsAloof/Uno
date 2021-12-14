@@ -50,7 +50,7 @@ namespace Un
         [SerializeField]
         List<int> taken = new List<int>();
 
-
+        private bool gamestart = false;
 
         #endregion
 
@@ -115,18 +115,23 @@ namespace Un
             if (PhotonNetwork.IsConnected)
             {
                 startGame();
+                gamestart = true;
             }
         }
 
         private void FixedUpdate()
         {
+            
+            if (!gamestart || !PhotonNetwork.IsMasterClient) 
+                return;
             foreach(UnPlayer player in Players)
             {
                 if(player.getDeck().Count == 0)
                 {
-                    // GG - You won
+                    PhotonNetwork.LoadLevel("Game Over");
+                    //ADD SOUND
                 }
-            }
+            }         
         }
 
         #endregion

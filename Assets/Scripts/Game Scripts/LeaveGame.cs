@@ -11,6 +11,7 @@ public class LeaveGame : MonoBehaviour
     public void OnClickLeaveRoom()
     {
         PhotonNetwork.LeaveRoom();
+        PhotonNetwork.LeaveLobby();
         if (SceneManager.GetActiveScene().name == "Game")
         {
             SceneManager.LoadScene("Lobby");
