@@ -417,7 +417,7 @@ namespace Un
 
         public void runPlusCardsEvent(int plusCard)
         {
-            photonView.RPC("GivePlusCards", RpcTarget.MasterClient, Players[turn].getPlayer(), plusCard, turn, direction); 
+            photonView.RPC("GivePlusCards", RpcTarget.All, Players[turn].getPlayer(), plusCard, turn, direction); 
         }
 
         public bool canStack(int plusCard, UnPlayer player)
@@ -479,19 +479,22 @@ namespace Un
         [PunRPC]
         void GivePlusCards(Player target, int plusCard, int turn, int direction)
         {
-            UnPlayer player = UnPlayer.getUnPlayer(target);
-            PlusCardType = plusCard;
-            PlusCardTotal += plusCard;
             PlusCardsActive = true;
-            if (!canStack(plusCard, player))
+            if(PhotonNetwork.IsMasterClient)
             {
-                giveCards(player, PlusCardTotal);
-                PlusCardsActive = false;
-                PlusCardTotal = 0;
-                PlusCardType = 0;
-                int next = getNextTurn(turn, direction);
-                photonView.RPC("NextTurn", RpcTarget.All, next);
-                return;
+                UnPlayer player = UnPlayer.getUnPlayer(target);
+                PlusCardType = plusCard;
+                PlusCardTotal += plusCard;
+                if (!canStack(plusCard, player))
+                {
+                    giveCards(player, PlusCardTotal);
+                    PlusCardsActive = false;
+                    PlusCardTotal = 0;
+                    PlusCardType = 0;
+                    int next = getNextTurn(turn, direction);
+                    photonView.RPC("NextTurn", RpcTarget.All, next);
+                    return;
+                }
             }
         }
 
