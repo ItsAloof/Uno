@@ -77,7 +77,8 @@ namespace Un
         public List<GameObject> localPlayerCards = new List<GameObject>();
         public List<GameObject> remotePlayerCards = new List<GameObject>();
 
-        public AudioSource cardSound;                                                                               //Card Sound Clip
+        public AudioSource cardSound;
+        public AudioSource clickSound;
 
         #endregion
 

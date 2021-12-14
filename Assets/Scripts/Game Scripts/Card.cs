@@ -52,6 +52,7 @@ namespace Un
 
         private void OnMouseEnter()
         {
+            gameManager.clickSound.Play();
             if (isDiscarded || PhotonNetwork.LocalPlayer != owner.getOwner())
                 return;
             Vector3 v = transform.localPosition;
