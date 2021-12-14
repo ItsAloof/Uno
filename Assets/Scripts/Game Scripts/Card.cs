@@ -48,6 +48,7 @@ namespace Un
         void Start()
         {
             gameManager = GameManager.gameManager;
+            cardInfo.setPlusCards(PlusCards);
         }
 
         private void OnMouseEnter()
@@ -116,9 +117,33 @@ namespace Un
                     }
                 }
                 discard();
+                foreach(CardInfo cardIn in gameManager.Players[owner.getOwnerId()].getDeck())
+                {
+                    Debug.Log($"Card {cardIn.getPosition()} is a {cardIn.getColor()} Number={cardIn.getCardNumber()}, PlusCards={cardIn.getPlusCards()}");
+                }
                 CardManager.updateTurnIndicator();
                 GameManager.gameManager.cardSound.Play();
                 PhotonNetwork.RaiseEvent(EventCodes.MOVE_CARD_EVENT, data, RaiseEventOptions.Default, SendOptions.SendReliable);
+
+                if (PhotonNetwork.IsMasterClient && PlusCards > 0 && CardManager.CurrentPlusType == 0)
+                {
+                    Debug.Log("Setting current Plus Card count and Type ");
+                    CardManager.CurrentPlusType = PlusCards;
+                    CardManager.CurrentPlusCards = PlusCards;
+                }
+                else if (CardManager.CurrentPlusType == PlusCards)
+                    CardManager.CurrentPlusCards += PlusCards;
+                if (PhotonNetwork.IsMasterClient && PlusCards > 0)
+                {
+                    Debug.Log("On Plus Cards");
+                    CardManager.onPlusCards(gameManager, gameManager.Players[gameManager.turn].getOwner(), gameManager.turn);
+                }
+                else if (PhotonNetwork.IsMasterClient && PlusCards == 0)
+                {
+                    Debug.Log("Resetting Current Plus Card Type and Count");
+                    CardManager.CurrentPlusType = 0;
+                    CardManager.CurrentPlusCards = 0;
+                }
             }
         }
 
@@ -176,6 +201,11 @@ namespace Un
         public int getNumber()
         {
             return Number;
+        }
+
+        public bool IsDiscarded()
+        {
+            return isDiscarded;
         }
 
         public void setPosition(int position)

@@ -50,11 +50,11 @@ public class CardInfo
             }
             CardInfo ci = new CardInfo(owner, position, index, color, number);
             if (isWild)
-                ci.isWild(isWild);
+                ci.setWild(isWild);
             if (isReverse)
-                ci.isReverse(isReverse);
+                ci.setReverse(isReverse);
             if (isSkip)
-                ci.isSkip(isSkip);
+                ci.setSkip(isSkip);
             ci.setPlusCards(plusCards);
             cards.Add(ci);
             position++;
@@ -107,19 +107,24 @@ public class CardInfo
         this.Position = position;
     }
 
+    public int getCardNumber()
+    {
+        return Number;
+    }
+
     public int getCardIndex()
     {
         return CardIndex;
     }
-    public void isWild(bool isWild)
+    public void setWild(bool isWild)
     {
         IsWild = isWild;
     }
-    public void isSkip(bool isSkip)
+    public void setSkip(bool isSkip)
     {
         IsSkip = isSkip;
     }
-    public void isReverse(bool isReverse)
+    public void setReverse(bool isReverse)
     {
         IsReverse = isReverse;
     }
@@ -127,6 +132,26 @@ public class CardInfo
     public void setPlusCards(int plusCards)
     {
         this.PlusCards = plusCards;
+    }
+
+    public bool isWild()
+    {
+        return IsWild;
+    }
+
+    public bool isReverse()
+    {
+        return IsReverse;
+    }
+
+    public bool isSkip()
+    {
+        return IsSkip;
+    }
+
+    public int getPlusCards()
+    {
+        return this.PlusCards;
     }
 
     public void setColor(string color)

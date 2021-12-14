@@ -380,6 +380,40 @@ namespace Un
             blueButton.SetActive(enable);
             yellowButton.SetActive(enable);
         }
+        public bool giveCards(Player player, int playerIndex, int amount, int plusType, int turn)
+        {
+            if (Players[localPlayer].getOwner().IsMasterClient)
+            {
+                Debug.Log("Running giveCards as MasterClient");
+                Debug.Log($"Checking {UnPlayer.getUnPlayer(player).getOwner().NickName}'s deck for matching plus card");
+                foreach (CardInfo cardInfo in Players[playerIndex].getDeck())
+                {
+                    if (cardInfo.getPlusCards() == plusType)
+                    {
+                        if(cardInfo.getCard() != null)
+                        {
+                            if (cardInfo.getCard().GetComponent<Card>().IsDiscarded())
+                                continue;
+                        }    
+                        Debug.Log($"Found matching card Color={cardInfo.getColor()} PlusCards={cardInfo.getPlusCards()}");
+                        return false;
+                    }
+                    Debug.Log($"Card {cardInfo.getPosition()}: Color={cardInfo.getColor()}, Number={cardInfo.getCardNumber()}, PlusCards={cardInfo.getPlusCards()}");
+                }
+                Debug.Log("Didn't Find matching card now giving cards to player.");
+                List<int> cards = new List<int>();
+                for (int i = 0; i < amount; i++)
+                {
+                    cards.Add(drawCard(player).getCardIndex());
+                }
+                object[] index = ToObjArr(cards.ToArray());
+                sendGeneratedCards(index, player, RpcTarget.All, playerIndex);
+                CardManager.CurrentPlusCards = 0;
+                CardManager.CurrentPlusType = 0;
+                return true;
+            }
+            return false;
+        }
 
         public void createDeck(bool local, UnPlayer unPlayer, int playerIndex, List<int> indexList)
         {
@@ -451,6 +485,8 @@ namespace Un
             }
         }
 
+
+
         [PunRPC]
         void pickColor(string color, int turn)
         {
@@ -477,7 +513,7 @@ namespace Un
                 }
             }
             discardPile.RemoveRange(0, discardPile.Count - 1);
-            discardPile[discardPile.Count - 1].transform.localPosition = new Vector3(0, 0, -discardPile.Count);
+            discardPile[discardPile.Count - 1].transform.localPosition = new Vector3(0, 0, 0);
         }
         #endregion
 

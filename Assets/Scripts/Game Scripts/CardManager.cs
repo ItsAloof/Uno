@@ -1,5 +1,6 @@
 using ExitGames.Client.Photon;
 using Photon.Pun;
+using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,16 +11,22 @@ namespace Un
     public class CardManager : MonoBehaviourPunCallbacks
     {
         int TurnData = 0, PositionData = 1, PlayerIdData = 2, DirectionData = 3;
+        [SerializeField]
+        public static int CurrentPlusCards = 0;
+        [SerializeField]
+        public static int CurrentPlusType = 0;
         public AudioSource cardSound;
 
         public override void OnEnable()
         {
             PhotonNetwork.NetworkingClient.EventReceived += NetworkingClient_EventReceived;
+            PhotonNetwork.NetworkingClient.EventReceived += NetworkingClient_TurnEvent;
         }
 
         public override void OnDisable()
         {
             PhotonNetwork.NetworkingClient.EventReceived -= NetworkingClient_EventReceived;
+            PhotonNetwork.NetworkingClient.EventReceived -= NetworkingClient_TurnEvent;
         }
 
         private void NetworkingClient_EventReceived(EventData obj)
@@ -49,7 +56,65 @@ namespace Un
                 gameManager.turn = turnDatum;
                 gameManager.direction = directionDatum;
                 updateTurnIndicator();
+                if(PhotonNetwork.IsMasterClient && ci.getPlusCards() > 0 && CurrentPlusCards == 0 && CurrentPlusType == 0)
+                {
+                    CurrentPlusType = ci.getPlusCards();
+                    CurrentPlusCards = ci.getPlusCards();
+                }
+                else if (CardManager.CurrentPlusType == ci.getPlusCards())
+                    CardManager.CurrentPlusCards += ci.getPlusCards();
+                if (PhotonNetwork.IsMasterClient && ci.getPlusCards() > 0 && ci.getPlusCards() == CurrentPlusCards)
+                {
+                    Debug.Log($"Current turn {turnDatum} and person having plus card used against them is {gameManager.Players[turnDatum]}");
+                    if(ci.isWild())
+                    {
+                        onPlusCards(gameManager, gameManager.Players[getNextTurn(turnDatum, directionDatum)].getOwner(), getNextTurn(turnDatum, directionDatum));
+                    }
+                    else
+                    {
+                        onPlusCards(gameManager, gameManager.Players[turnDatum].getOwner(), turnDatum);
+                    }
+                }
+                else if (PhotonNetwork.IsMasterClient)
+                {
+                    CurrentPlusType = 0;
+                    CurrentPlusCards = 0;
+                }
             }
+        }
+
+        public static void onPlusCards(GameManager gameManager, Player player, int turn)
+        {
+            Debug.Log("Running onPlusCards...");
+            if (gameManager.giveCards(player, UnPlayer.getUnPlayer(player).getOwnerId(), CurrentPlusCards, CurrentPlusType, turn))
+            {
+                Debug.Log("Giving cards to player");
+                gameManager.turn = getNextTurn(gameManager.turn, gameManager.direction);
+                object[] turnData = new object[] { gameManager.turn };
+                PhotonNetwork.RaiseEvent(EventCodes.END_TURN_EVENT, turnData, RaiseEventOptions.Default, SendOptions.SendReliable);
+            }
+        }
+
+        public void NetworkingClient_TurnEvent(EventData obj)
+        {
+            Debug.Log("Skipping player.");
+            if (obj.Code == EventCodes.END_TURN_EVENT)
+            {
+                object[] data = (object[])obj.CustomData;
+                int turnDatum = (int)data[0];
+                GameManager.gameManager.turn = turnDatum;
+                updateTurnIndicator();
+            }
+        }
+
+        public static int getNextTurn(int turn, int direction)
+        {
+            int next = turn + direction;
+            if (next >= GameManager.gameManager.Players.Count)
+                next = 0;
+            else if (next < 0)
+                next = GameManager.gameManager.Players.Count - 1;
+            return next;
         }
 
         public static void updateTurnIndicator()
