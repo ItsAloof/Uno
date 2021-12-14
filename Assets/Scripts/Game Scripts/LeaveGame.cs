@@ -12,7 +12,7 @@ public class LeaveGame : MonoBehaviour
     {
         PhotonNetwork.LeaveRoom();
         
-        if (SceneManager.GetActiveScene().name == "Game Over")
+        if (SceneManager.GetActiveScene().name == "Game Over" || SceneManager.GetActiveScene().name == "Game")
         {
             SceneManager.LoadScene("Lobby");
         }
