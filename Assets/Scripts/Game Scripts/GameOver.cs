@@ -9,25 +9,39 @@ using UnityEngine.SceneManagement;
 public class GameOver : MonoBehaviour
 {
     public GameObject nextGameButton;
-    public int count = PhotonNetwork.CurrentRoom.PlayerCount;
-    public Text playerCount;
     
+    public Text playerCount;
+    public int count;
+    public bool iAmCalled = false;
+    public void getPlayerCount()
+    {
+        count = PhotonNetwork.CurrentRoom.PlayerCount;
+    }
 
-   public void OnClickNextGame()
+    public void OnClickNextGame()
     {
         PhotonNetwork.LoadLevel("Game");
     }
     public void Update()
     {
+        if (!iAmCalled)
+        {
+            getPlayerCount();
+            iAmCalled = true;
+        }
         if (PhotonNetwork.IsMasterClient && PhotonNetwork.CurrentRoom.PlayerCount == count)
         {
             playerCount.text = "Player Count: " + PhotonNetwork.CurrentRoom.PlayerCount;
             nextGameButton.SetActive(true);
         }
+        else if (PhotonNetwork.IsMasterClient && PhotonNetwork.CurrentRoom.PlayerCount != count)
+        {
+            playerCount.text = "A Player Has Left.";
+            nextGameButton.SetActive(false);
+        }
         else
         {
-            playerCount.text = "A Player Has Left." + PhotonNetwork.CurrentRoom.PlayerCount;
-            nextGameButton.SetActive(false);
+            playerCount.text = "Wait for Next Game or Leave Game";
         }
     }
 
