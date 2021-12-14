@@ -343,11 +343,11 @@ namespace Un
         {
             if (turn != localPlayer || discardPile.Count == 0 || pickingColor)
                 return;
-            foreach (CardInfo card in Players[localPlayer].getDeck())
-            {
-                if (card.canPlay(discardPile[discardPile.Count - 1].GetComponent<Card>().getCardInfo()))
-                    return;
-            }
+            //foreach (CardInfo card in Players[localPlayer].getDeck())
+            //{
+            //    if (card.canPlay(discardPile[discardPile.Count - 1].GetComponent<Card>().getCardInfo()))
+            //        return;
+            //}
 
             photonView.RPC("drawCard", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer, localPlayer);
         }
@@ -480,7 +480,8 @@ namespace Un
         void GivePlusCards(Player target, int plusCard, int turn, int direction)
         {
             PlusCardsActive = true;
-            if(PhotonNetwork.IsMasterClient)
+            PlusCardType = plusCard;
+            if (PhotonNetwork.IsMasterClient)
             {
                 UnPlayer player = UnPlayer.getUnPlayer(target);
                 PlusCardType = plusCard;
@@ -488,9 +489,6 @@ namespace Un
                 if (!canStack(plusCard, player))
                 {
                     giveCards(player, PlusCardTotal);
-                    PlusCardsActive = false;
-                    PlusCardTotal = 0;
-                    PlusCardType = 0;
                     int next = getNextTurn(turn, direction);
                     photonView.RPC("NextTurn", RpcTarget.All, next);
                     return;
@@ -503,6 +501,8 @@ namespace Un
         {
             this.turn = turn;
             PlusCardsActive = false;
+            PlusCardTotal = 0;
+            PlusCardType = 0;
             CardManager.updateTurnIndicator();
         }
 
